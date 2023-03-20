@@ -9,11 +9,11 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
 
-import com.cjcj55.literallynot.databinding.FragmentSecondBinding;
+import com.cjcj55.literallynot.databinding.AccountcreationscreenuiBinding;
 
-public class SecondFragment extends Fragment {
 
-    private FragmentSecondBinding binding;
+public class AccountCreationScreen extends Fragment {
+    private AccountcreationscreenuiBinding binding;
 
     @Override
     public View onCreateView(
@@ -21,7 +21,7 @@ public class SecondFragment extends Fragment {
             Bundle savedInstanceState
     ) {
 
-        binding = FragmentSecondBinding.inflate(inflater, container, false);
+        binding = AccountcreationscreenuiBinding.inflate(inflater, container, false);
         return binding.getRoot();
 
     }
@@ -29,11 +29,11 @@ public class SecondFragment extends Fragment {
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        binding.buttonSecond.setOnClickListener(new View.OnClickListener() {
+        binding.AccCreationBckBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                NavHostFragment.findNavController(SecondFragment.this)
-                        .navigate(R.id.action_SecondFragment_to_FirstFragment);
+                NavHostFragment.findNavController(AccountCreationScreen.this)
+                        .navigate(R.id.action_AccountCreationScreen_to_LoginScreen);
             }
         });
     }
@@ -45,3 +45,5 @@ public class SecondFragment extends Fragment {
     }
 
 }
+
+

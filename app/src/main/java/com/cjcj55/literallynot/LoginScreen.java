@@ -9,11 +9,12 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
 
-import com.cjcj55.literallynot.databinding.FragmentFirstBinding;
 
-public class FirstFragment extends Fragment {
-//Whatitdo
-    private FragmentFirstBinding binding;
+import com.cjcj55.literallynot.databinding.LoginscreenuiBinding;
+
+public class LoginScreen extends Fragment {
+
+    private LoginscreenuiBinding binding;
 
     @Override
     public View onCreateView(
@@ -21,7 +22,7 @@ public class FirstFragment extends Fragment {
             Bundle savedInstanceState
     ) {
 
-        binding = FragmentFirstBinding.inflate(inflater, container, false);
+        binding = LoginscreenuiBinding.inflate(inflater, container, false);
         return binding.getRoot();
 
     }
@@ -29,14 +30,24 @@ public class FirstFragment extends Fragment {
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        binding.buttonFirst.setOnClickListener(new View.OnClickListener() {
+        binding.LoginBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                NavHostFragment.findNavController(FirstFragment.this)
-                        .navigate(R.id.action_FirstFragment_to_SecondFragment);
+                NavHostFragment.findNavController(LoginScreen.this)
+                        .navigate(R.id.action_LoginScreen_to_MainScreen);
+            }
+        });
+
+
+        binding.ToAccCreationBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                NavHostFragment.findNavController(LoginScreen.this)
+                        .navigate(R.id.action_LoginScreen_to_AccountCreationScreen);
             }
         });
     }
+
 
     @Override
     public void onDestroyView() {
