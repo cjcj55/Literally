@@ -12,7 +12,7 @@ import androidx.navigation.fragment.NavHostFragment;
 import com.cjcj55.literallynot.databinding.FragmentFirstBinding;
 
 public class FirstFragment extends Fragment {
-
+//Whatitdo
     private FragmentFirstBinding binding;
 
     @Override
