@@ -36,6 +36,15 @@ public class AccountCreationScreen extends Fragment {
                         .navigate(R.id.action_AccountCreationScreen_to_LoginScreen);
             }
         });
+
+        binding.backtologbtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                NavHostFragment.findNavController(AccountCreationScreen.this)
+                        .navigate(R.id.action_AccountCreationScreen_to_LoginScreen);
+            }
+        });
+
     }
 
 
