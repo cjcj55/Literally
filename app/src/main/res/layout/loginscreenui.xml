@@ -5,7 +5,34 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".LoginScreen">
+    <EditText
+        android:id="@+id/editTextTextPassword"
+        android:layout_width="300dp"
+        android:layout_height="48dp"
+        android:layout_marginBottom="44dp"
+        android:autofillHints="true"
+        android:ems="10"
+        android:hint="Password"
+        android:inputType="textPassword"
+        android:textColorHint="#7E7878"
+        app:layout_constraintBottom_toTopOf="@+id/LoginBtn"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.495"
+        app:layout_constraintStart_toStartOf="parent" />
 
+    <EditText
+        android:id="@+id/editUser"
+        android:layout_width="300dp"
+        android:layout_height="48dp"
+        android:autofillHints="true"
+        android:ems="10"
+        android:hint="Username or Email"
+        android:textColorHint="#7E7878"
+        app:layout_constraintBottom_toTopOf="@+id/editTextTextPassword"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.495"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/LoginScreenHeader" />
     <TextView
         android:id="@+id/LoginScreenHeader"
         android:layout_width="148dp"
