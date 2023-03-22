@@ -8,7 +8,7 @@ $u = "root";
 $p = "literally123";
 
 if ($conn = mysqli_connect("ip-172-31-14-70.us-east-2.compute.internal", $u, $p, $dbName)) {
-    echo "Connection established to ${dbName}";
+    //echo "Connection established to ${dbName}";
 }
 
 ?>

@@ -3,6 +3,7 @@ package com.cjcj55.literallynot.db;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
@@ -23,51 +24,47 @@ import java.util.Map;
 
 public class MySQLHelper {
     private static final String API_URL = "http://18.223.125.204/";
-    public static boolean registerAccount(String username, String password, String email, String firstName, String lastName, Context context, Activity activity) {
-        if (checkInputs(username, password, email, firstName, lastName)) {
-            StringRequest stringRequest = new StringRequest(Request.Method.POST,
-                    API_URL + "register.php",
-                    new Response.Listener<String>() {
-                        @Override
-                        public void onResponse(String response) {
-                            try {
-                                JSONObject jsonObject = new JSONObject(response);
+    public static void registerAccount(String username, String password, String email, String firstName, String lastName, Context context) {
+        StringRequest stringRequest = new StringRequest(Request.Method.POST,
+                API_URL + "register.php",
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            JSONObject jsonObject = new JSONObject(response);
 
-                                String success = jsonObject.getString("success");
-                                if (success.equals("1")) {
-                                    Toast.makeText(context, "User registered successfully", Toast.LENGTH_SHORT).show();
-                                } else {
-                                    Toast.makeText(context, "User could not register", Toast.LENGTH_SHORT).show();
-                                }
-                            } catch (JSONException e) {
-                                throw new RuntimeException(e);
+                            String success = jsonObject.getString("success");
+                            if (success.equals("1")) {
+                                Toast.makeText(context, "User registered successfully", Toast.LENGTH_SHORT).show();
+                            } else {
+                                Toast.makeText(context, "User could not register", Toast.LENGTH_SHORT).show();
                             }
+                        } catch (JSONException e) {
+                            throw new RuntimeException(e);
                         }
-                    }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    Toast.makeText(context, "error:" + error.getMessage(), Toast.LENGTH_SHORT).show();
-                }
-            }) {
-                @Nullable
-                @Override
-                protected Map<String, String> getParams() throws AuthFailureError {
-                    Map<String, String> params = new HashMap<>();
-                    params.put("username", username);
-                    params.put("pass", password);
-                    params.put("email", email);
-                    params.put("firstName", firstName);
-                    params.put("lastName", lastName);
-                    return params;
-                }
-            };
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Toast.makeText(context, "error:" + error.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        }) {
+            @Nullable
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> params = new HashMap<>();
+                params.put("username", username);
+                params.put("pass", password);
+                params.put("email", email);
+                params.put("firstName", firstName);
+                params.put("lastName", lastName);
+                return params;
+            }
+        };
 
-            RequestQueue queue = Volley.newRequestQueue(context);
-            queue.add(stringRequest);
-            return true;
-        } else {
-            return false;
-        }
+        RequestQueue queue = Volley.newRequestQueue(context);
+        queue.add(stringRequest);
+
     }
 
     private static boolean checkInputs(String username, String password, String email, String firstName, String lastName) {
