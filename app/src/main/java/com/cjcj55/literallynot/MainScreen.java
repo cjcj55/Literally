@@ -39,6 +39,13 @@ public class MainScreen extends Fragment {
         });
     }
 
+    private String getEmailOrUsername(){
+        return binding.editUser.getText().toString();
+    }
+    private String getPassword(){
+        return binding.editTextTextPassword.getText().toString();
+    }
+
     @Override
     public void onDestroyView() {
         super.onDestroyView();
