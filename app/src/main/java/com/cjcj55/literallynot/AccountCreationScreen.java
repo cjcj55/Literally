@@ -29,7 +29,7 @@ public class AccountCreationScreen extends Fragment {
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        binding.AccCreationBckBtn.setOnClickListener(new View.OnClickListener() {
+        binding.createNewAccountButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 NavHostFragment.findNavController(AccountCreationScreen.this)
@@ -37,6 +37,7 @@ public class AccountCreationScreen extends Fragment {
             }
         });
     }
+
 
     @Override
     public void onDestroyView() {
