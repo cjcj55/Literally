@@ -22,10 +22,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class MySQLHelper {
+    private static final String API_URL = "http://18.223.125.204/";
     public static boolean registerAccount(String username, String password, String email, String firstName, String lastName, Context context, Activity activity) {
         if (checkInputs(username, password, email, firstName, lastName)) {
             StringRequest stringRequest = new StringRequest(Request.Method.POST,
-                    "http://18.223.125.204/register.php",
+                    API_URL + "register.php",
                     new Response.Listener<String>() {
                         @Override
                         public void onResponse(String response) {
@@ -110,7 +111,7 @@ public class MySQLHelper {
 
     public static void login(String userNameOrEmail, String password, Context context, Activity activity) {
         StringRequest stringRequest = new StringRequest(Request.Method.POST,
-                "http://18.223.125.204/login.php",
+                API_URL + "login.php",
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
