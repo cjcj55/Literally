@@ -36,8 +36,6 @@ public class LoginScreen extends Fragment {
             public void onClick(View view) {
                 NavHostFragment.findNavController(LoginScreen.this)
                         .navigate(R.id.action_LoginScreen_to_MainScreen);
-                Intent serviceIntent = new Intent(getActivity(), ForegroundService.class);
-                getActivity().startService(serviceIntent);
             }
         });
 
