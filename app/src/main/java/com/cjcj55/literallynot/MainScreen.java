@@ -30,13 +30,14 @@ public class MainScreen extends Fragment {
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        binding.buttonSecond.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                NavHostFragment.findNavController(MainScreen.this)
-                        .navigate(R.id.action_SecondFragment_to_LoginScreen);
-            }
-        });
+
+    }
+
+    private String getEmailOrUsername(){
+        return binding.editUser.getText().toString();
+    }
+    private String getPassword(){
+        return binding.editTextTextPassword.getText().toString();
     }
 
     @Override
