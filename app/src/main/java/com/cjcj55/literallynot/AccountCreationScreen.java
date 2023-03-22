@@ -43,7 +43,7 @@ public class AccountCreationScreen extends Fragment {
         binding.createNewAccountButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (checkInputs(getUsername(), getNewPassword(), getNewEmail(), getFirstName(), getLastName())) {
+                if (checkInputs(getUsername(), getNewPassword(), getNewEmail(), getFirstName(), getLastName(), view)) {
                     NavHostFragment.findNavController(AccountCreationScreen.this)
                             .navigate(R.id.action_AccountCreationScreen_to_LoginScreen);
                 }
@@ -82,7 +82,7 @@ public class AccountCreationScreen extends Fragment {
         return binding.editTextTextLastName.getText().toString();
     }
 
-    private boolean checkInputs(String username, String password, String email, String firstName, String lastName) {
+    private boolean checkInputs(String username, String password, String email, String firstName, String lastName, View view) {
         boolean check = true;
 
         if (username.isBlank()) {
