@@ -11,6 +11,7 @@ import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
 
 import com.cjcj55.literallynot.databinding.AccountcreationscreenuiBinding;
+import com.cjcj55.literallynot.db.MySQLHelper;
 
 
 public class AccountCreationScreen extends Fragment {
@@ -44,6 +45,7 @@ public class AccountCreationScreen extends Fragment {
             @Override
             public void onClick(View view) {
                 if (checkInputs(getUsername(), getNewPassword(), getNewEmail(), getFirstName(), getLastName(), view)) {
+                    MySQLHelper.registerAccount(getUsername(), getNewPassword(), getNewEmail(), getFirstName(), getLastName(), getContext());
                     NavHostFragment.findNavController(AccountCreationScreen.this)
                             .navigate(R.id.action_AccountCreationScreen_to_LoginScreen);
                 }
