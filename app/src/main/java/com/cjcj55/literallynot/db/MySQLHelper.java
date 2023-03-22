@@ -67,46 +67,7 @@ public class MySQLHelper {
 
     }
 
-    private static boolean checkInputs(String username, String password, String email, String firstName, String lastName) {
-        boolean check = true;
-        if (username.isBlank() || password.isBlank() || email.isBlank() || firstName.isBlank() || lastName.isBlank() || !email.contains("@") || !email.contains(".")) {
-            check = false;
-        }
-
-        if (username.isBlank()) {
-//            binding.firstnameErrorText.setText("This Field is Required");
-//            binding.firstnameErrorText.setVisibility(view.VISIBLE);
-        } else {
-
-        }
-        if (password.isBlank()) {
-
-        } else if (password.length() < 7) {
-
-        } else {
-
-        }
-        if (email.isBlank()) {
-
-        } else if (!email.contains("@") || !email.contains(".")) {
-
-        } else {
-
-        }
-        if (firstName.isBlank()) {
-
-        } else {
-
-        }
-        if (lastName.isBlank()) {
-
-        } else {
-
-        }
-        return check;
-    }
-
-    public static void login(String userNameOrEmail, String password, Context context, Activity activity) {
+    public static void login(String userNameOrEmail, String password, Context context, Activity activity, LoginCallback loginCallback) {
         StringRequest stringRequest = new StringRequest(Request.Method.POST,
                 API_URL + "login.php",
                 new Response.Listener<String>() {
@@ -129,8 +90,10 @@ public class MySQLHelper {
                                 editor.putString("firstName", firstName);
                                 editor.putString("lastName", lastName);
                                 editor.apply();
+                                loginCallback.onSuccess(uid, un, firstName, lastName);
                             } else {
                                 Toast.makeText(context, "Invalid username/email or password", Toast.LENGTH_SHORT).show();
+                                loginCallback.onFailure();
                             }
                         } catch (JSONException e) {
                             throw new RuntimeException(e);
@@ -139,6 +102,7 @@ public class MySQLHelper {
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
+                loginCallback.onFailure();
                 Toast.makeText(context, "error:" + error.getMessage(), Toast.LENGTH_SHORT).show();
             }
         })
