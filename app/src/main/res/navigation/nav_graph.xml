@@ -3,8 +3,14 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/LoginScreen">
+    app:startDestination="@id/TestFragment">
 
+    <fragment
+        android:id="@+id/TestFragment"
+        android:name="com.cjcj55.literallynot.TestFragment"
+        android:label="testScreen"
+        tools:layout="@layout/test_page"
+        />
     <fragment
         android:id="@+id/LoginScreen"
         android:name="com.cjcj55.literallynot.LoginScreen"
