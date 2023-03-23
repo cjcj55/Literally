@@ -31,6 +31,9 @@
         <action
             android:id="@+id/action_SecondFragment_to_LoginScreen"
             app:destination="@id/LoginScreen" />
+        <action
+            android:id="@+id/action_MainScreen_to_ReportScreen"
+            app:destination="@id/ReportScreen" />
     </fragment>
 
     <fragment
@@ -41,5 +44,15 @@
         <action
             android:id="@+id/action_AccountCreationScreen_to_LoginScreen"
             app:destination="@id/LoginScreen" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/ReportScreen"
+        android:name="com.cjcj55.literallynot.ReportScreen"
+        android:label="Reports"
+        tools:layout="@layout/reportscreenui">
+        <action
+            android:id="@+id/action_ReportScreen_to_MainScreen"
+            app:destination="@id/MainScreen" />
     </fragment>
 </navigation>

@@ -30,13 +30,31 @@ public class MainScreen extends Fragment {
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        binding.buttonSecond.setOnClickListener(new View.OnClickListener() {
+        binding.sendNotificationButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                sendPushNotification();
+            }
+        });
+
+        binding.reportBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 NavHostFragment.findNavController(MainScreen.this)
-                        .navigate(R.id.action_SecondFragment_to_LoginScreen);
+                        .navigate(R.id.action_MainScreen_to_ReportScreen);
             }
         });
+
+
+    }
+
+    private void sendPushNotification() {
+        // Get a reference to the parent activity
+        MainActivity activity = (MainActivity) getActivity();
+        if (activity != null) {
+            // Call the createNotification() method on the activity reference
+            activity.createNotification();
+        }
     }
 
     @Override
