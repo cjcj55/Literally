@@ -89,6 +89,7 @@ public class MySQLHelper {
                                 editor.putString("username", un);
                                 editor.putString("firstName", firstName);
                                 editor.putString("lastName", lastName);
+                                editor.putBoolean("isLoggedIn", true);
                                 editor.apply();
                                 loginCallback.onSuccess(uid, un, firstName, lastName);
                             } else {
