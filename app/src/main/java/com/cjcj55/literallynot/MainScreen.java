@@ -30,6 +30,12 @@ public class MainScreen extends Fragment {
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        binding.sendNotificationButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                sendPushNotification();
+            }
+        });
 
         binding.reportBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -40,6 +46,15 @@ public class MainScreen extends Fragment {
         });
 
 
+    }
+
+    private void sendPushNotification() {
+        // Get a reference to the parent activity
+        MainActivity activity = (MainActivity) getActivity();
+        if (activity != null) {
+            // Call the createNotification() method on the activity reference
+            activity.createNotification();
+        }
     }
 
     @Override
