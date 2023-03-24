@@ -36,8 +36,8 @@ public class ForegroundService extends Service {
         SpeechRecognizer speechRecognizer;
         
         // Stop the foreground service when your work is done
-        stopForeground(true);
-        stopSelf();
+        //stopForeground(true);
+       // stopSelf();
 
         return START_NOT_STICKY;
     }

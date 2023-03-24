@@ -115,7 +115,7 @@ public class MainActivity extends AppCompatActivity {
         if (checkPermissions()) {
             // Show the notification
             NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
-            notificationManager.notify(0, builder.build());
+            notificationManager.notify(1369420, builder.build());
         } else {
             // Request the necessary permissions
             requestPermissions();

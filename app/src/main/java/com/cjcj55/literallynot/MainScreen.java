@@ -1,5 +1,6 @@
 package com.cjcj55.literallynot;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,6 +12,7 @@ import androidx.navigation.fragment.NavHostFragment;
 
 
 import com.cjcj55.literallynot.databinding.MainscreenuiBinding;
+import com.cjcj55.literallynot.db.MySQLHelper;
 
 public class MainScreen extends Fragment {
 
@@ -30,6 +32,11 @@ public class MainScreen extends Fragment {
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+
+        // Start the foreground service
+        Intent intent = new Intent(getActivity(), ForegroundService.class);
+        getActivity().startService(intent);
+
         binding.sendNotificationButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -42,6 +49,13 @@ public class MainScreen extends Fragment {
             public void onClick(View view) {
                 NavHostFragment.findNavController(MainScreen.this)
                         .navigate(R.id.action_MainScreen_to_ReportScreen);
+            }
+        });
+
+        binding.logoutButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                MySQLHelper.logout(getContext(), MainScreen.this);
             }
         });
 
