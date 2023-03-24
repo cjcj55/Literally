@@ -7,6 +7,8 @@ import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.navigation.fragment.NavHostFragment;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
@@ -15,6 +17,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.cjcj55.literallynot.R;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -120,5 +123,77 @@ public class MySQLHelper {
 
         RequestQueue queue = Volley.newRequestQueue(context);
         queue.add(stringRequest);
+    }
+
+    public static void logout(Context context, Fragment fragment) {
+        StringRequest stringRequest = new StringRequest(Request.Method.POST,
+                API_URL + "logout.php",
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        SharedPreferences sharedPreferences = context.getSharedPreferences("myAppPrefs", Context.MODE_PRIVATE);
+                        boolean isLoggedIn = sharedPreferences.getBoolean("isLoggedIn", false);
+                        if (isLoggedIn) {
+                            SharedPreferences.Editor editor = sharedPreferences.edit();
+                            editor.clear();
+                            editor.apply();
+
+                            // TODO: navigate to main screen!
+                            NavHostFragment.findNavController(fragment)
+                                    .navigate(R.id.action_logout_to_LoginScreen);
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Toast.makeText(context, "error:" + error.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        RequestQueue queue = Volley.newRequestQueue(context);
+        queue.add(stringRequest);
+    }
+
+    public static void uploadAudio(String username, String password, String email, String firstName, String lastName, Context context) {
+        StringRequest stringRequest = new StringRequest(Request.Method.POST,
+                API_URL + "audio-upload.php",
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            JSONObject jsonObject = new JSONObject(response);
+
+                            String success = jsonObject.getString("success");
+                            if (success.equals("1")) {
+                                Toast.makeText(context, "You said literally", Toast.LENGTH_SHORT).show();
+                            } else {
+                                Toast.makeText(context, "Unable to upload audio file", Toast.LENGTH_SHORT).show();
+                            }
+                        } catch (JSONException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Toast.makeText(context, "error:" + error.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        }) {
+            @Nullable
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> params = new HashMap<>();
+                params.put("username", username);
+                params.put("pass", password);
+                params.put("email", email);
+                params.put("firstName", firstName);
+                params.put("lastName", lastName);
+                return params;
+            }
+        };
+
+        RequestQueue queue = Volley.newRequestQueue(context);
+        queue.add(stringRequest);
+
     }
 }
