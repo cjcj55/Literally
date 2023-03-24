@@ -37,6 +37,13 @@ public class LoginScreen extends Fragment {
         editUserNameOrEmail = binding.editUser;
         editPassword = binding.editTextTextPassword;
 
+
+
+        // Stop the foreground service
+        Intent intent = new Intent(getActivity(), ForegroundService.class);
+        getActivity().stopService(intent);
+
+
         binding.LoginBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

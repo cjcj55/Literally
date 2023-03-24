@@ -34,8 +34,8 @@ public class ForegroundService extends Service {
         // Do your work here, such as recording audio
 
         // Stop the foreground service when your work is done
-        stopForeground(true);
-        stopSelf();
+        //stopForeground(true);
+       // stopSelf();
 
         return START_NOT_STICKY;
     }
