@@ -1,5 +1,6 @@
 package com.cjcj55.literallynot;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -29,6 +30,11 @@ public class MainScreen extends Fragment {
 
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+
+        // Start the foreground service
+        Intent intent = new Intent(getActivity(), ForegroundService.class);
+        getActivity().startService(intent);
 
         binding.sendNotificationButton.setOnClickListener(new View.OnClickListener() {
             @Override
