@@ -7,6 +7,8 @@ import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.navigation.fragment.NavHostFragment;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
@@ -15,6 +17,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.cjcj55.literallynot.R;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -122,9 +125,9 @@ public class MySQLHelper {
         queue.add(stringRequest);
     }
 
-    public static void logout(Context context) {
+    public static void logout(Context context, Fragment fragment) {
         StringRequest stringRequest = new StringRequest(Request.Method.POST,
-                API_URL + "audio-upload.php",
+                API_URL + "logout.php",
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
@@ -136,6 +139,8 @@ public class MySQLHelper {
                             editor.apply();
 
                             // TODO: navigate to main screen!
+                            NavHostFragment.findNavController(fragment)
+                                    .navigate(R.id.action_logout_to_LoginScreen);
                         }
                     }
                 }, new Response.ErrorListener() {
