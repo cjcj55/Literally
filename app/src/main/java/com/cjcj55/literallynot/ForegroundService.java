@@ -82,6 +82,7 @@ public class ForegroundService extends Service {
                 ArrayList<String> matches = results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
                 if (matches != null && matches.size() > 0) {
                     String spokenText = matches.get(0);
+                    System.out.println(spokenText);
                 }
             }
 
