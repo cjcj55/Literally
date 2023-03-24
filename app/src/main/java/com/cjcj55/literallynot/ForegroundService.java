@@ -7,6 +7,7 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.Build;
 import android.os.IBinder;
+import android.speech.SpeechRecognizer;
 
 import androidx.core.app.NotificationCompat;
 
@@ -32,7 +33,8 @@ public class ForegroundService extends Service {
             startForeground(1001, notification.build());
         }
         // Do your work here, such as recording audio
-
+        SpeechRecognizer speechRecognizer;
+        
         // Stop the foreground service when your work is done
         stopForeground(true);
         stopSelf();
