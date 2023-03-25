@@ -44,7 +44,7 @@ public class ForegroundService extends Service {
         spIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
         spIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault());
         spIntent.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, this.getPackageName());
-
+        speechRecognizer.startListening(spIntent);
         speechRecognizer.setRecognitionListener(new RecognitionListener() {
             @Override
             public void onReadyForSpeech(Bundle bundle) {
