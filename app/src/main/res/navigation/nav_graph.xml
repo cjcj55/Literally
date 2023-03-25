@@ -5,6 +5,7 @@
     android:id="@+id/nav_graph"
     app:startDestination="@id/LoginScreen">
 
+
     <fragment
         android:id="@+id/LoginScreen"
         android:name="com.cjcj55.literallynot.LoginScreen"
