@@ -5,8 +5,11 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Intent;
+import android.media.MediaRecorder;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
+import android.os.Handler;
 import android.os.IBinder;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
@@ -14,12 +17,16 @@ import android.speech.SpeechRecognizer;
 
 import androidx.core.app.NotificationCompat;
 
+import java.lang.Thread;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Locale;
 
-public class ForegroundService extends Service {
+public class ForegroundService extends Service implements Runnable {
 
     private static final int NOTIFICATION_ID = 1;
+    private MediaRecorder recorder;
+    private String outputFile;
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -39,6 +46,15 @@ public class ForegroundService extends Service {
             startForeground(1001, notification.build());
         }
         // Do your work here, such as recording audio
+        //This small segment of code will startRecording immediately
+        //The output file will need to become dynamic for the future so it can have locations in the circular buffer
+        outputFile = Environment.getExternalStorageDirectory().getAbsolutePath() + "/recording.3gp";
+        try {
+            startRecording();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
         SpeechRecognizer speechRecognizer = SpeechRecognizer.createSpeechRecognizer(this);
         final Intent spIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         spIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
@@ -102,10 +118,42 @@ public class ForegroundService extends Service {
 
         return START_NOT_STICKY;
     }
+    private void startRecording() throws IOException {
+        //Initialization of the Microphone
+        recorder = new MediaRecorder();
+        recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+        recorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+        recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
+        recorder.setOutputFile(outputFile);
 
+        //Starts the recorder when this function is called
+        try{
+            recorder.prepare();
+            recorder.start();
+        } catch (IOException e){
+            e.printStackTrace();
+        }
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                stopRecording();
+            }
+        }, 5000); //5000 is 5 seconds
+    }
+
+    private void stopRecording(){
+        recorder.stop();
+        recorder.release();
+        //recorder = null;
+    }
     @Override
     public IBinder onBind(Intent intent) {
         // This service does not support binding, so return null
         return null;
+    }
+
+    @Override
+    public void run() {
+
     }
 }
