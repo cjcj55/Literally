@@ -3,6 +3,7 @@ package com.cjcj55.literallynot.db;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -19,9 +20,15 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.cjcj55.literallynot.R;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -138,7 +145,6 @@ public class MySQLHelper {
                             editor.clear();
                             editor.apply();
 
-                            // TODO: navigate to main screen!
                             NavHostFragment.findNavController(fragment)
                                     .navigate(R.id.action_logout_to_LoginScreen);
                         }
@@ -154,46 +160,69 @@ public class MySQLHelper {
         queue.add(stringRequest);
     }
 
-    public static void uploadAudio(String username, String password, String email, String firstName, String lastName, Context context) {
+    public static void sendAudioFile(String userId, Uri audioFileUri, Context context, final AudioUploadCallback audioUploadCallback) {
+        File audioFile = new File(audioFileUri.getPath());
+        HttpEntity httpEntity = MultipartEntityBuilder.create()
+                .addBinaryBody("audio_file", audioFile, ContentType.create("audio/mpeg"), audioFile.getName())
+                .build();
+
         StringRequest stringRequest = new StringRequest(Request.Method.POST,
                 API_URL + "audio-upload.php",
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        try {
-                            JSONObject jsonObject = new JSONObject(response);
-
-                            String success = jsonObject.getString("success");
-                            if (success.equals("1")) {
-                                Toast.makeText(context, "You said literally", Toast.LENGTH_SHORT).show();
-                            } else {
-                                Toast.makeText(context, "Unable to upload audio file", Toast.LENGTH_SHORT).show();
-                            }
-                        } catch (JSONException e) {
-                            throw new RuntimeException(e);
+                        if (response.equals("1")) {
+                            audioUploadCallback.onSuccess();
+                        } else {
+                            audioUploadCallback.onFailure();
                         }
                     }
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Toast.makeText(context, "error:" + error.getMessage(), Toast.LENGTH_SHORT).show();
+                audioUploadCallback.onFailure();
             }
         }) {
-            @Nullable
+            private final HttpEntity mHttpEntity = httpEntity;
+
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
                 Map<String, String> params = new HashMap<>();
-                params.put("username", username);
-                params.put("pass", password);
-                params.put("email", email);
-                params.put("firstName", firstName);
-                params.put("lastName", lastName);
+                params.put("user_id", userId);
                 return params;
+            }
+
+            @Override
+            public String getBodyContentType() {
+                return mHttpEntity.getContentType().getValue();
+            }
+
+            @Override
+            public byte[] getBody() throws AuthFailureError {
+                try {
+                    ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                    mHttpEntity.writeTo(bos);
+                    return bos.toByteArray();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
             }
         };
 
         RequestQueue queue = Volley.newRequestQueue(context);
         queue.add(stringRequest);
-
+    }
+    public static void getAllUsers(Context context, Response.Listener<String> responseListener) {
+        StringRequest stringRequest = new StringRequest(Request.Method.GET,
+                API_URL + "get-all-users.php",
+                responseListener,
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Toast.makeText(context, "Error: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+        RequestQueue queue = Volley.newRequestQueue(context);
+        queue.add(stringRequest);
     }
 }
