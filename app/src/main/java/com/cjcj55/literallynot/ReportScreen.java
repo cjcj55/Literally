@@ -41,10 +41,12 @@ public class ReportScreen extends Fragment {
 
 
         // Make the network request to get all users
+        showLoadingIndicator();
         MySQLHelper.getAllUsers(getContext(), new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
                 try {
+                    hideLoadingIndicator();
                     JSONArray jsonArray = new JSONArray(response);
                     // Iterate over the array and extract user data
                     for (int i = 0; i < jsonArray.length(); i++) {
@@ -61,6 +63,15 @@ public class ReportScreen extends Fragment {
                 }
             }
         });
+    }
+    private void showLoadingIndicator() {
+        binding.progressBar.setVisibility(View.VISIBLE);
+        binding.userTextView.setVisibility(View.INVISIBLE);
+    }
+
+    private void hideLoadingIndicator() {
+        binding.progressBar.setVisibility(View.GONE);
+        binding.userTextView.setVisibility(View.VISIBLE);
     }
 
 }

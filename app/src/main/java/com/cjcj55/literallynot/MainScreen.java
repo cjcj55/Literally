@@ -31,7 +31,7 @@ public class MainScreen extends Fragment {
 
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        hideLoadingIndicator();
+
 
         // Start the foreground service
         Intent intent = new Intent(getActivity(), ForegroundService.class);
@@ -47,7 +47,6 @@ public class MainScreen extends Fragment {
         binding.reportBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                showLoadingIndicator();
                 NavHostFragment.findNavController(MainScreen.this)
                         .navigate(R.id.action_MainScreen_to_ReportScreen);
             }
@@ -78,12 +77,6 @@ public class MainScreen extends Fragment {
         binding = null;
     }
 
-    private void showLoadingIndicator() {
-        binding.progressBar.setVisibility(View.VISIBLE);
-    }
 
-    private void hideLoadingIndicator() {
-        binding.progressBar.setVisibility(View.GONE);
-    }
 
 }
