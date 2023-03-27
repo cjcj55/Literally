@@ -98,7 +98,7 @@ public class ForegroundService extends Service {
         });
         // Stop the foreground service when your work is done
         //stopForeground(true);
-       // stopSelf();
+        // stopSelf();
 
         return START_NOT_STICKY;
     }
