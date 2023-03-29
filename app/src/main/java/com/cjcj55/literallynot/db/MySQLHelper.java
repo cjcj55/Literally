@@ -19,10 +19,6 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.cjcj55.literallynot.R;
-
-import org.apache.http.HttpEntity;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -160,55 +156,16 @@ public class MySQLHelper {
         queue.add(stringRequest);
     }
 
-    public static void sendAudioFile(String userId, Uri audioFileUri, Context context, final AudioUploadCallback audioUploadCallback) {
-        File audioFile = new File(audioFileUri.getPath());
-        HttpEntity httpEntity = MultipartEntityBuilder.create()
-                .addBinaryBody("audio_file", audioFile, ContentType.create("audio/mpeg"), audioFile.getName())
-                .build();
-
-        StringRequest stringRequest = new StringRequest(Request.Method.POST,
-                API_URL + "audio-upload.php",
-                new Response.Listener<String>() {
+    public static void getAllUsers(Context context, Response.Listener<String> responseListener) {
+        StringRequest stringRequest = new StringRequest(Request.Method.GET,
+                API_URL + "get-all-users.php",
+                responseListener,
+                new Response.ErrorListener() {
                     @Override
-                    public void onResponse(String response) {
-                        if (response.equals("1")) {
-                            audioUploadCallback.onSuccess();
-                        } else {
-                            audioUploadCallback.onFailure();
-                        }
+                    public void onErrorResponse(VolleyError error) {
+                        Toast.makeText(context, "Error: " + error.getMessage(), Toast.LENGTH_SHORT).show();
                     }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                audioUploadCallback.onFailure();
-            }
-        }) {
-            private final HttpEntity mHttpEntity = httpEntity;
-
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                Map<String, String> params = new HashMap<>();
-                params.put("user_id", userId);
-                return params;
-            }
-
-            @Override
-            public String getBodyContentType() {
-                return mHttpEntity.getContentType().getValue();
-            }
-
-            @Override
-            public byte[] getBody() throws AuthFailureError {
-                try {
-                    ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                    mHttpEntity.writeTo(bos);
-                    return bos.toByteArray();
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        };
-
+                });
         RequestQueue queue = Volley.newRequestQueue(context);
         queue.add(stringRequest);
     }
