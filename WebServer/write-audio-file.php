@@ -7,6 +7,11 @@ $targetFile = $targetDir . basename($_FILES["audio_file"]["name"]);
 $uploadOk = 1;
 $audioFileType = strtolower(pathinfo($targetFile, PATHINFO_EXTENSION));
 
+// Define the upload directory and make sure it exists
+if (!file_exists($targetDir)) {
+    mkdir($targetDir, 0777, true);
+}
+
 // Check if file already exists
 if (file_exists($targetFile)) {
     echo "Sorry, file already exists.";
@@ -27,8 +32,8 @@ if ($uploadOk == 0) {
     if (move_uploaded_file($_FILES["audio_file"]["tmp_name"], $targetFile)) {
         // Save relative path of file to database
         $filePath = $targetDir . basename($_FILES["audio_file"]["name"]);
-        $stmt = $conn->prepare("INSERT INTO audio_clips (user_id, filepath) VALUES (?, ?)");
-        $stmt->bind_param("is", $userId, $filePath);
+        $stmt = $conn->prepare("INSERT INTO audio_clips (user_id, time_said, filepath) VALUES (?, ?, ?)");
+        $stmt->bind_param("is", $userId, NOW(), $filePath);
         $stmt->execute();
         $stmt->close();
         echo "The file ". htmlspecialchars(basename($_FILES["audio_file"]["name"])). " has been uploaded.";

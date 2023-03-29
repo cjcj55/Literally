@@ -229,8 +229,9 @@ public class MySQLHelper {
                                 JSONObject audioFileObject = response.getJSONObject(i);
                                 int audioFileId = audioFileObject.getInt("id");
                                 int audioFileUserId = audioFileObject.getInt("user_id");
+                                String dateTime = audioFileObject.getString("time_said");
                                 String audioFilePath = audioFileObject.getString("file_path");
-                                AudioFile audioFile = new AudioFile(audioFileId, audioFileUserId, audioFilePath);
+                                AudioFile audioFile = new AudioFile(audioFileId, audioFileUserId, dateTime, audioFilePath);
                                 audioFilesList.add(audioFile);
                             }
                             AudioFile[] audioFilesArray = new AudioFile[audioFilesList.size()];

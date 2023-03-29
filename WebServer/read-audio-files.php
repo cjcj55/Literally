@@ -15,6 +15,7 @@ while ($row = $result->fetch_assoc()) {
     $audioFile = array(
         'id' => $row['id'],
         'user_id' => $row['user_id'],
+        'time_said' => $row['time_said'],
         'file_path' => $row['file_path']
     );
     array_push($audioFiles, $audioFile);
