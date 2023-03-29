@@ -169,4 +169,17 @@ public class MySQLHelper {
         RequestQueue queue = Volley.newRequestQueue(context);
         queue.add(stringRequest);
     }
+    public static void getAllUsers(Context context, Response.Listener<String> responseListener) {
+        StringRequest stringRequest = new StringRequest(Request.Method.GET,
+                API_URL + "get-all-users.php",
+                responseListener,
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Toast.makeText(context, "Error: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+        RequestQueue queue = Volley.newRequestQueue(context);
+        queue.add(stringRequest);
+    }
 }
