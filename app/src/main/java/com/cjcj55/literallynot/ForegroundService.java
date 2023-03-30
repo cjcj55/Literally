@@ -169,7 +169,9 @@ public class ForegroundService extends Service implements Runnable{
         public void startRecording() throws IOException{
             //outputFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/AudioRecording_" + System.currentTimeMillis() + ".mp3");
             //If we can get setOutputFile Working this will be completed
-            recorder.setOutputFile(output.);
+            String audioFileName = "myaudiofile.mp3";
+            File outputFile = new File(getCacheDir(), audioFileName);
+            recorder.setOutputFile(outputFile.getAbsolutePath());
             recorder.prepare();
             recorder.start();
             callback = new Runnable() {
