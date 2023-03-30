@@ -70,7 +70,7 @@ public class ForegroundService extends Service implements Runnable{
         try {
             AudioRecorder recorder = new AudioRecorder();
             recorder.startRecording();
-            recorder.stopRecording();
+          //  recorder.stopRecording();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
