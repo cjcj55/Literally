@@ -7,11 +7,13 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.media.AudioFormat;
-import android.media.AudioRecord;
 import android.media.MediaRecorder;
 import android.os.Build;
+import android.os.Bundle;
+
 import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
@@ -22,25 +24,14 @@ import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Locale;
 
-public class ForegroundService extends Service {
-    private static final String TAG = "ForegroundService";
-    private static final String CHANNEL_ID = "ForegroundServiceChannel";
-    private static final int RECORDING_RATE = 44100;
-    private static final int CHANNEL = AudioFormat.CHANNEL_IN_MONO;
-    private static final int FORMAT = AudioFormat.ENCODING_PCM_16BIT;
-    private static final int BUFFER_SIZE = AudioRecord.getMinBufferSize(RECORDING_RATE, CHANNEL, FORMAT);
-    private static final int FILE_LENGTH_IN_SECONDS = 5;
-    private static final String FILE_NAME = "_recording.pcm";
-
-    private AudioRecord recorder;
-    private boolean isRecording = false;
-    private ExecutorService executorService = Executors.newSingleThreadExecutor();
+public class ForegroundService extends Service implements Runnable{
 
     @Override
     public void onCreate() {
@@ -64,7 +55,41 @@ public class ForegroundService extends Service {
 
         startForeground(1, notification);
 
-        startStreaming();
+            // Start the foreground service with the notification
+            startForeground(1001, notification.build());
+        }
+        // Do your work here, such as recording audio
+        SpeechRecognizer speechRecognizer = SpeechRecognizer.createSpeechRecognizer(this);
+        final Intent spIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+        spIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+        spIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault());
+        spIntent.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, this.getPackageName());
+        //Initializes the MediaRecorder for audio recording
+        PackageManager m = getPackageManager();
+        String s = getPackageName();
+        PackageInfo p = null;
+        try {
+            p = m.getPackageInfo(s, 0);
+        } catch (PackageManager.NameNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+        s = p.applicationInfo.dataDir;
+        System.out.println(s);
+        System.out.println(m);
+        System.out.println(p);
+        try {
+            AudioRecorder recorder = new AudioRecorder();
+            recorder.startRecording();
+          //  recorder.stopRecording();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        //speechRecognizer.startListening(spIntent);
+        speechRecognizer.setRecognitionListener(new RecognitionListener() {
+            @Override
+            public void onReadyForSpeech(Bundle bundle) {
+
+            }
 
         return START_NOT_STICKY;
     }
@@ -204,9 +229,11 @@ public class ForegroundService extends Service {
     private class RecordingTask implements Runnable {
         private final FileOutputStream outputStream;
 
-        public RecordingTask(FileOutputStream outputStream) {
-            this.outputStream = outputStream;
-        }
+            }
+        });
+        // Stop the foreground service when your work is done
+        //stopForeground(true);
+       // stopSelf();
 
         @Override
         public void run() {
@@ -235,5 +262,60 @@ public class ForegroundService extends Service {
         Log.d(TAG, "onTaskRemoved() called");
         stopRecording();
         stopSelf();
+    }
+
+    @Override
+    public void run() {
+
+    }
+    //In order to get context for file location was required to
+    public class AudioRecorder{
+
+        private MediaRecorder recorder;
+        private ByteArrayOutputStream output;
+        private Handler handler;
+        private Runnable callback;
+        //Constructor  for the Audio Recorder.  Thank you sleep deprivation
+        public AudioRecorder() throws IOException{
+            //Initialize the AudioRecorder variables
+            recorder = new MediaRecorder();
+            recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+            recorder.setOutputFormat(MediaRecorder.OutputFormat.AMR_WB);
+            recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_WB);
+            recorder.setAudioSamplingRate(44100);
+            recorder.setAudioChannels(AudioFormat.ENCODING_DEFAULT);  //Doesn't crash program when set to DEFAUKT
+            recorder.setAudioEncodingBitRate(AudioFormat.ENCODING_MP3);
+            //Create the output stream for the thing
+            output = new ByteArrayOutputStream();
+            handler = new Handler();
+
+        }
+
+        public void startRecording() throws IOException{
+            //outputFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/AudioRecording_" + System.currentTimeMillis() + ".mp3");
+            //If we can get setOutputFile Working this will be completed
+            String audioFileName = "myaudiofile.mp3";
+            File outputFile = new File(getCacheDir(), audioFileName);
+            recorder.setOutputFile(outputFile.getAbsolutePath());
+            recorder.prepare();
+            recorder.start();
+            callback = new Runnable() {
+                @Override
+                public void run() {
+                    byte[] recordBytes = output.toByteArray();
+                    String recordedText = new String(recordBytes, StandardCharsets.UTF_8);
+                    System.out.println(recordedText);
+                    handler.postDelayed(this, 5000);
+                }
+            };
+            handler.postDelayed(callback, 5000);
+
+        }
+        public void stopRecording(){
+            recorder.stop();
+            recorder.reset();
+            recorder.release();
+            handler.removeCallbacks(callback);
+        }
     }
 }

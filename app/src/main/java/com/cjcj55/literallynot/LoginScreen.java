@@ -1,6 +1,10 @@
 package com.cjcj55.literallynot;
 
+import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,13 +12,18 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 
 import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
 
 
 import com.cjcj55.literallynot.databinding.LoginscreenuiBinding;
+import com.cjcj55.literallynot.db.AudioUploadCallback;
 import com.cjcj55.literallynot.db.LoginCallback;
 import com.cjcj55.literallynot.db.MySQLHelper;
+
+import java.io.File;
 
 public class LoginScreen extends Fragment {
 
@@ -37,6 +46,9 @@ public class LoginScreen extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         editUserNameOrEmail = binding.editUser;
         editPassword = binding.editTextTextPassword;
+
+
+       System.out.println(checkPermissions());
 
 
 
@@ -69,6 +81,26 @@ public class LoginScreen extends Fragment {
         binding.ToAccCreationBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+                String userId = "000";
+                Uri audioFileUri = Uri.fromFile(new File(requireContext().getCacheDir(), "audio_file.mp3"));
+                Context context = requireContext();
+                AudioUploadCallback audioUploadCallback = new AudioUploadCallback() {
+                    @Override
+                    public void onSuccess() {
+                        // Handle success
+                        System.out.println("WWWW");
+                    }
+
+                    @Override
+                    public void onFailure() {
+                        System.out.println("LLL");
+                        // Handle failure
+                    }
+                };
+
+                MySQLHelper.sendAudioFile(userId, audioFileUri, context, audioUploadCallback);
+
                 NavHostFragment.findNavController(LoginScreen.this)
                         .navigate(R.id.action_LoginScreen_to_AccountCreationScreen);
             }
@@ -107,6 +139,33 @@ public class LoginScreen extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
+    }
+    private boolean checkPermissions() {
+        // Check if all the necessary permissions are granted
+        boolean isPermissionGranted = true;
+        if (ActivityCompat.checkSelfPermission(requireContext(), android.Manifest.permission.VIBRATE) != PackageManager.PERMISSION_GRANTED) {
+            isPermissionGranted = false;
+        }
+        if (ActivityCompat.checkSelfPermission(requireContext(), android.Manifest.permission.FOREGROUND_SERVICE) != PackageManager.PERMISSION_GRANTED) {
+            isPermissionGranted = false;
+        }
+        if (ActivityCompat.checkSelfPermission(requireContext(), android.Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+            isPermissionGranted = false;
+        }
+        if (ActivityCompat.checkSelfPermission(requireContext(), android.Manifest.permission.INTERNET) != PackageManager.PERMISSION_GRANTED) {
+            isPermissionGranted = false;
+        }
+        if (ActivityCompat.checkSelfPermission(requireContext(), android.Manifest.permission.WAKE_LOCK) != PackageManager.PERMISSION_GRANTED) {
+            isPermissionGranted = false;
+        }
+        if (ActivityCompat.checkSelfPermission(requireContext(), android.Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+            isPermissionGranted = false;
+        }
+        if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_NOTIFICATION_POLICY) != PackageManager.PERMISSION_GRANTED) {
+            isPermissionGranted = false;
+        }
+        // Add checks for other permissions here...
+        return isPermissionGranted;
     }
 
 }
