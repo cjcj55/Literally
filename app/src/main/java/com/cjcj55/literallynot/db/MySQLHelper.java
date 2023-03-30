@@ -174,6 +174,7 @@ public class MySQLHelper {
                         if (response.equals("1")) {
                             audioUploadCallback.onSuccess();
                         } else {
+                            System.out.println("SAD");
                             audioUploadCallback.onFailure();
                         }
                     }

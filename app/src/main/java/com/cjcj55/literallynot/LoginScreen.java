@@ -1,6 +1,8 @@
 package com.cjcj55.literallynot;
 
+import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,8 +15,11 @@ import androidx.navigation.fragment.NavHostFragment;
 
 
 import com.cjcj55.literallynot.databinding.LoginscreenuiBinding;
+import com.cjcj55.literallynot.db.AudioUploadCallback;
 import com.cjcj55.literallynot.db.LoginCallback;
 import com.cjcj55.literallynot.db.MySQLHelper;
+
+import java.io.File;
 
 public class LoginScreen extends Fragment {
 
@@ -37,6 +42,9 @@ public class LoginScreen extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         editUserNameOrEmail = binding.editUser;
         editPassword = binding.editTextTextPassword;
+
+
+
 
 
 
@@ -69,6 +77,26 @@ public class LoginScreen extends Fragment {
         binding.ToAccCreationBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+                String userId = "000";
+                Uri audioFileUri = Uri.fromFile(new File(requireContext().getCacheDir(), "audio_file.mp3"));
+                Context context = requireContext();
+                AudioUploadCallback audioUploadCallback = new AudioUploadCallback() {
+                    @Override
+                    public void onSuccess() {
+                        // Handle success
+                        System.out.println("WWWW");
+                    }
+
+                    @Override
+                    public void onFailure() {
+                        System.out.println("LLL");
+                        // Handle failure
+                    }
+                };
+
+                MySQLHelper.sendAudioFile(userId, audioFileUri, context, audioUploadCallback);
+
                 NavHostFragment.findNavController(LoginScreen.this)
                         .navigate(R.id.action_LoginScreen_to_AccountCreationScreen);
             }
