@@ -175,25 +175,9 @@ public class MySQLHelper {
     public static void writeAudioFileForUser(Context context, File audioFile) {
         SharedPreferences sharedPreferences = context.getSharedPreferences("myAppPrefs", Context.MODE_PRIVATE);
         int userId = sharedPreferences.getInt("user_id", -1);
-        StringRequest stringRequest = new StringRequest(Request.Method.POST,
-                API_URL + "audio-upload.php",
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        if (response.equals("1")) {
-                            audioUploadCallback.onSuccess();
-                        } else {
-                            System.out.println("SAD");
-                            audioUploadCallback.onFailure();
-                        }
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                audioUploadCallback.onFailure();
-            }
-        }) {
-            private final HttpEntity mHttpEntity = httpEntity;
+
+        // Create AsyncHttpClient
+        AsyncHttpClient client = new AsyncHttpClient();
 
         // Create RequestParams
         RequestParams params = new RequestParams();
@@ -219,6 +203,10 @@ public class MySQLHelper {
                 // Handle error response
                 String errorString = error.getMessage();
                 Log.e("UPLOAD", "Error: " + errorString);
+                Log.e("UPLOAD", "Status code: " + statusCode);
+                for (Header header : headers) {
+                    Log.e("UPLOAD", "Header: " + header.getName() + " = " + header.getValue());
+                }
             }
         });
     }

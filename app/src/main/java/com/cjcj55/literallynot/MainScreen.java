@@ -75,14 +75,8 @@ public class MainScreen extends Fragment {
     }
 
     private void uploadFile() {
-        // Get the resource ID of the audio file
-        int audioResourceId = getResources().getIdentifier("test_sound", "raw", getActivity().getPackageName());
-
-        // Load the audio file as a Uri object
-        Uri audioUri = Uri.parse("android.resource://" + getActivity().getPackageName() + "/" + audioResourceId);
-
-        File audioFile = new File(audioUri.getPath());
-        MySQLHelper.writeAudioFileForUser(getContext(), audioFile);
+        File file = new File(getActivity().getCacheDir(), "myaudiofile.mp3");
+        MySQLHelper.writeAudioFileForUser(getContext(), file);
     }
 
     @Override

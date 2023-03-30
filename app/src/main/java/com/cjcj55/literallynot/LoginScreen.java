@@ -24,6 +24,7 @@ import com.cjcj55.literallynot.db.LoginCallback;
 import com.cjcj55.literallynot.db.MySQLHelper;
 
 import java.io.File;
+import java.io.IOException;
 
 public class LoginScreen extends Fragment {
 
@@ -98,8 +99,6 @@ public class LoginScreen extends Fragment {
                         // Handle failure
                     }
                 };
-
-                MySQLHelper.sendAudioFile(userId, audioFileUri, context, audioUploadCallback);
 
                 NavHostFragment.findNavController(LoginScreen.this)
                         .navigate(R.id.action_LoginScreen_to_AccountCreationScreen);

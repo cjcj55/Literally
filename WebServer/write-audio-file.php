@@ -3,9 +3,11 @@ require_once 'connect.php';
 
 $userId = $_POST['user_id'];
 $targetDir = "uploads/";
-$targetFile = $targetDir . basename($_FILES["audio_file"]["name"]);
+$extension = pathinfo($_FILES['audio_file']['name'], PATHINFO_EXTENSION);
+$fileName = bin2hex(random_bytes(8)) . ".$extension";
+$targetFile = $targetDir . $fileName;
 $uploadOk = 1;
-$audioFileType = strtolower(pathinfo($targetFile, PATHINFO_EXTENSION));
+$audioFileType = strtolower($extension);
 
 // Define the upload directory and make sure it exists
 if (!file_exists($targetDir)) {
@@ -19,8 +21,8 @@ if (file_exists($targetFile)) {
 }
 
 // Allow certain file formats
-if($audioFileType != "mp3") {
-    echo "Sorry, only MP3 files are allowed.";
+if($audioFileType != "mp3" && $audioFileType != "wav") {
+    echo "Sorry, only MP3 and WAV files are allowed.";
     $uploadOk = 0;
 }
 
@@ -31,14 +33,17 @@ if ($uploadOk == 0) {
 } else {
     if (move_uploaded_file($_FILES["audio_file"]["tmp_name"], $targetFile)) {
         // Save relative path of file to database
-        $filePath = $targetDir . basename($_FILES["audio_file"]["name"]);
+        $filePath = $targetDir . $fileName;
         $stmt = $conn->prepare("INSERT INTO audio_clips (user_id, time_said, filepath) VALUES (?, ?, ?)");
         $stmt->bind_param("is", $userId, NOW(), $filePath);
         $stmt->execute();
         $stmt->close();
-        echo "The file ". htmlspecialchars(basename($_FILES["audio_file"]["name"])). " has been uploaded.";
+        echo "The file has been uploaded as " . $fileName;
     } else {
-        echo "Sorry, there was an error uploading your file.";
+        if ($_FILES["audio_file"]["error"] > 0) {
+            echo "Sorry, there was an error uploading your file: " . $_FILES["audio_file"]["error"];
+            $uploadOk = 0;
+        }        
     }
 }
 
