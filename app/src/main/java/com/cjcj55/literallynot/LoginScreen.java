@@ -61,8 +61,9 @@ public class LoginScreen extends Fragment {
         binding.LoginBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (checkInputs(getUsernameOrEmail(), getPassword(), view)) {
-                    MySQLHelper.login(getUsernameOrEmail(), getPassword(), getContext(), getActivity(), new LoginCallback() {
+//                if (checkInputs(getUsernameOrEmail(), getPassword(), view)) {
+//                    MySQLHelper.login(getUsernameOrEmail(), getPassword(), getContext(), getActivity(), new LoginCallback() {
+                    MySQLHelper.login("cjcj55", "password", getContext(), getActivity(), new LoginCallback() {
                         @Override
                         public void onSuccess(int userId, String username, String firstName, String lastName) {
                             NavHostFragment.findNavController(LoginScreen.this)
@@ -74,7 +75,7 @@ public class LoginScreen extends Fragment {
 
                         }
                     });
-                }
+//                }
             }
         });
 

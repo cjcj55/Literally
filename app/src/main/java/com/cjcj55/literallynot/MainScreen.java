@@ -75,8 +75,8 @@ public class MainScreen extends Fragment {
     }
 
     private void uploadFile() {
-        File file = new File(getActivity().getCacheDir(), "myaudiofile.mp3");
-        MySQLHelper.writeAudioFileForUser(getContext(), file);
+        File file = new File(getActivity().getCacheDir(), "bean.mp3");
+        MySQLHelper.writeAudioFile(getContext(), file);
     }
 
     @Override

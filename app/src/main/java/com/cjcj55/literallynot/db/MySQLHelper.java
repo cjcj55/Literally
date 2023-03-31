@@ -3,6 +3,7 @@ package com.cjcj55.literallynot.db;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.util.Log;
 import android.widget.Toast;
@@ -25,22 +26,43 @@ import com.android.volley.toolbox.Volley;
 import com.cjcj55.literallynot.R;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
+import com.loopj.android.http.BinaryHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 import cz.msebera.android.httpclient.Header;
+import cz.msebera.android.httpclient.entity.mime.content.ByteArrayBody;
+import cz.msebera.android.httpclient.entity.mime.content.FileBody;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 public class MySQLHelper {
     private static final String API_URL = "http://18.223.125.204/";
@@ -172,43 +194,90 @@ public class MySQLHelper {
         queue.add(stringRequest);
     }
 
-    public static void writeAudioFileForUser(Context context, File audioFile) {
+    public static void writeAudioFile(Context context, File file) {
         SharedPreferences sharedPreferences = context.getSharedPreferences("myAppPrefs", Context.MODE_PRIVATE);
-        int userId = sharedPreferences.getInt("user_id", -1);
+        String userId = String.valueOf(sharedPreferences.getInt("user_id", -1));
 
-        // Create AsyncHttpClient
-        AsyncHttpClient client = new AsyncHttpClient();
+        String baseUrl = API_URL + "write-audio-file.php/";
 
-        // Create RequestParams
-        RequestParams params = new RequestParams();
-        try {
-            params.put("audio_file", audioFile);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-        params.put("user_id", String.valueOf(userId));
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(baseUrl)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
 
-        // Send multipart request
-        String url = API_URL + "write-audio-file.php";
-        client.post(url, params, new AsyncHttpResponseHandler() {
+        ApiInterface apiInterface = retrofit.create(ApiInterface.class);
+
+        RequestBody requestBody = RequestBody.create(MediaType.parse("audio/*"), file);
+
+        MultipartBody.Part filePart = MultipartBody.Part.createFormData("audio", file.getName(), requestBody);
+
+        RequestBody userIdPart = RequestBody.create(MediaType.parse("text/plain"), userId);
+
+        Call<ResponseBody> call = apiInterface.uploadAudio(filePart, userIdPart);
+        call.enqueue(new Callback<ResponseBody>() {
             @Override
-            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
-                // Handle successful response
-                String responseString = new String(responseBody);
-                Log.d("UPLOAD", "Response: " + responseString);
+            public void onResponse(Call<ResponseBody> call, retrofit2.Response<ResponseBody> response) {
+                // Handle the response here
+                System.out.println(file.getName() + " has been successfully uploaded!");
+                System.out.println("Response message: " + response.message());
+
             }
 
             @Override
-            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
-                // Handle error response
-                String errorString = error.getMessage();
-                Log.e("UPLOAD", "Error: " + errorString);
-                Log.e("UPLOAD", "Status code: " + statusCode);
-                for (Header header : headers) {
-                    Log.e("UPLOAD", "Header: " + header.getName() + " = " + header.getValue());
-                }
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                // Handle the failure here
+                System.out.println(file.getName() + " has failed to upload");
+                System.out.println("Error message: " + t.getMessage());
             }
         });
+
+    }
+
+    public static void uploadMp3File(File file, Context context) {
+        try {
+            // Open a connection to the PHP script
+            URL url = new URL(API_URL + "write-audio-file.php");
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("POST");
+            connection.setDoOutput(true);
+
+            SharedPreferences sharedPreferences = context.getSharedPreferences("myAppPrefs", Context.MODE_PRIVATE);
+            int userId = sharedPreferences.getInt("user_id", -1);
+
+            // Set the request body to the mp3 file
+            FileInputStream fileInputStream = new FileInputStream(file);
+            OutputStream outputStream = connection.getOutputStream();
+            byte[] buffer = new byte[4096];
+            int bytesRead;
+            while ((bytesRead = fileInputStream.read(buffer)) != -1) {
+                outputStream.write(buffer, 0, bytesRead);
+            }
+
+            // Add the user_id parameter to the request
+            String parameters = "user_id=" + userId;
+            outputStream.write(parameters.getBytes());
+
+            // Check the response code
+            int responseCode = connection.getResponseCode();
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                // Handle a successful upload
+                InputStream inputStream = connection.getInputStream();
+                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+                String response = bufferedReader.readLine();
+                // ...
+            } else {
+                // Handle an error
+                // ...
+            }
+
+            // Clean up
+            outputStream.close();
+            fileInputStream.close();
+            connection.disconnect();
+        } catch (Exception e) {
+            // Handle an exception
+            // ...
+        }
     }
 
 
