@@ -13,9 +13,15 @@ import androidx.navigation.fragment.NavHostFragment;
 
 
 import com.cjcj55.literallynot.databinding.MainscreenuiBinding;
+import com.cjcj55.literallynot.db.AudioFile;
 import com.cjcj55.literallynot.db.MySQLHelper;
 
 import java.io.File;
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class MainScreen extends Fragment {
 
@@ -29,12 +35,10 @@ public class MainScreen extends Fragment {
 
         binding = MainscreenuiBinding.inflate(inflater, container, false);
         return binding.getRoot();
-
     }
 
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
 
         // Start the foreground service
         Intent intent = new Intent(getActivity(), ForegroundService.class);
@@ -62,7 +66,17 @@ public class MainScreen extends Fragment {
             }
         });
 
-
+//        MySQLHelper.readAudioFiles(getContext(), new Callback<List<AudioFile>>() {
+//            @Override
+//            public void onResponse(Call<List<AudioFile>> call, retrofit2.Response<List<AudioFile>> response) {
+//
+//            }
+//
+//            @Override
+//            public void onFailure(Call<List<AudioFile>> call, Throwable t) {
+//                // handle error
+//            }
+//        });
     }
 
     private void sendPushNotification() {
@@ -84,7 +98,4 @@ public class MainScreen extends Fragment {
         super.onDestroyView();
         binding = null;
     }
-
-
-
 }

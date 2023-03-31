@@ -50,7 +50,9 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
 
 import cz.msebera.android.httpclient.Header;
 import cz.msebera.android.httpclient.entity.mime.content.ByteArrayBody;
@@ -233,110 +235,74 @@ public class MySQLHelper {
 
     }
 
-    public static void uploadMp3File(File file, Context context) {
-        try {
-            // Open a connection to the PHP script
-            URL url = new URL(API_URL + "write-audio-file.php");
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod("POST");
-            connection.setDoOutput(true);
-
-            SharedPreferences sharedPreferences = context.getSharedPreferences("myAppPrefs", Context.MODE_PRIVATE);
-            int userId = sharedPreferences.getInt("user_id", -1);
-
-            // Set the request body to the mp3 file
-            FileInputStream fileInputStream = new FileInputStream(file);
-            OutputStream outputStream = connection.getOutputStream();
-            byte[] buffer = new byte[4096];
-            int bytesRead;
-            while ((bytesRead = fileInputStream.read(buffer)) != -1) {
-                outputStream.write(buffer, 0, bytesRead);
-            }
-
-            // Add the user_id parameter to the request
-            String parameters = "user_id=" + userId;
-            outputStream.write(parameters.getBytes());
-
-            // Check the response code
-            int responseCode = connection.getResponseCode();
-            if (responseCode == HttpURLConnection.HTTP_OK) {
-                // Handle a successful upload
-                InputStream inputStream = connection.getInputStream();
-                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-                String response = bufferedReader.readLine();
-                // ...
-            } else {
-                // Handle an error
-                // ...
-            }
-
-            // Clean up
-            outputStream.close();
-            fileInputStream.close();
-            connection.disconnect();
-        } catch (Exception e) {
-            // Handle an exception
-            // ...
-        }
-    }
-
-
-    public static void readAudioFilesForUser(Context context, Response.Listener<AudioFile[]> responseListener, Response.ErrorListener errorListener) {
-        SharedPreferences sharedPreferences = context.getSharedPreferences("myAppPrefs", Context.MODE_PRIVATE);
-        int userId = sharedPreferences.getInt("user_id", -1);
-
-        // Create request URL with user ID as a parameter
-        String url = API_URL + "read-audio-files.php?user_id=" + userId;
-
-        // Create JsonRequest using Volley
-        JsonRequest<JSONArray> jsonRequest = new JsonRequest<JSONArray>(
-                Request.Method.GET,
-                url,
-                null,
-                new Response.Listener<JSONArray>() {
-                    @Override
-                    public void onResponse(JSONArray response) {
-                        try {
-                            ArrayList<AudioFile> audioFilesList = new ArrayList<>();
-                            for (int i = 0; i < response.length(); i++) {
-                                JSONObject audioFileObject = response.getJSONObject(i);
-                                int audioFileId = audioFileObject.getInt("id");
-                                int audioFileUserId = audioFileObject.getInt("user_id");
-                                String dateTime = audioFileObject.getString("time_said");
-                                String audioFilePath = audioFileObject.getString("file_path");
-                                AudioFile audioFile = new AudioFile(audioFileId, audioFileUserId, dateTime, audioFilePath);
-                                audioFilesList.add(audioFile);
-                            }
-                            AudioFile[] audioFilesArray = new AudioFile[audioFilesList.size()];
-                            audioFilesList.toArray(audioFilesArray);
-                            responseListener.onResponse(audioFilesArray);
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                },
-                errorListener
-        ) {
-            @Override
-            protected Response<JSONArray> parseNetworkResponse(NetworkResponse response) {
-                String jsonString;
-                try {
-                    jsonString = new String(response.data, HttpHeaderParser.parseCharset(response.headers));
-                } catch (UnsupportedEncodingException e) {
-                    jsonString = new String(response.data);
-                }
-                try {
-                    return Response.success(new JSONArray(jsonString), HttpHeaderParser.parseCacheHeaders(response));
-                } catch (JSONException e) {
-                    return Response.error(new ParseError(e));
-                }
-            }
-        };
-
-        // Add request to request queue
-        Volley.newRequestQueue(context).add(jsonRequest);
-    }
-
+//    public static void readAudioFiles(Context context, Callback<List<AudioFile>> callback) {
+//        String baseUrl = API_URL + "retrieve-audio-files.php/";
+//        SharedPreferences sharedPreferences = context.getSharedPreferences("myAppPrefs", Context.MODE_PRIVATE);
+//        String userId = String.valueOf(sharedPreferences.getInt("user_id", -1));
+//
+//        Retrofit retrofit = new Retrofit.Builder()
+//                .baseUrl(baseUrl)
+//                .addConverterFactory(GsonConverterFactory.create())
+//                .build();
+//
+//        ApiInterface apiInterface = retrofit.create(ApiInterface.class);
+//
+//        Call<List<AudioFile>> call = apiInterface.getAudioFiles(Integer.parseInt(userId));
+//        call.enqueue(new Callback<List<AudioFile>>() {
+//            @Override
+//            public void onResponse(Call<List<AudioFile>> call, retrofit2.Response<List<AudioFile>> response) {
+//                if (response.isSuccessful()) {
+//                    List<AudioFile> audioFiles = new ArrayList<>();
+//                    List<AudioFile> serverAudioFiles = response.body();
+//                    CountDownLatch latch = new CountDownLatch(serverAudioFiles.size());
+//
+//                    for (AudioFile serverAudioFile : serverAudioFiles) {
+//                        String fileName = serverAudioFile.getFileName();
+//                        String timeSaid = serverAudioFile.getTimeSaid();
+//                        apiInterface.getAudioFile(Integer.parseInt(userId), fileName).enqueue(new Callback<ResponseBody>() {
+//                            @Override
+//                            public void onResponse(Call<ResponseBody> call, retrofit2.Response<ResponseBody> response) {
+//                                if (response.isSuccessful()) {
+//                                    try {
+//                                        byte[] audioData = response.body().bytes();
+//                                        AudioFile audioFile = new AudioFile(fileName, timeSaid, audioData);
+//                                        audioFiles.add(audioFile);
+//                                    } catch (IOException e) {
+//                                        e.printStackTrace();
+//                                    }
+//                                } else {
+//                                    // handle error
+//                                }
+//                                latch.countDown();
+//                            }
+//
+//                            @Override
+//                            public void onFailure(Call<ResponseBody> call, Throwable t) {
+//                                // handle error
+//                                latch.countDown();
+//                            }
+//                        });
+//                    }
+//
+//                    try {
+//                        latch.await(); // wait for all requests to finish
+//                    } catch (InterruptedException e) {
+//                        e.printStackTrace();
+//                    }
+//
+//                    Response<List<AudioFile>> retrofitResponse = Response.success(audioFiles);
+//                    callback.onResponse(retrofitResponse);
+//                } else {
+//                    callback.onFailure(new Throwable("Failed to retrieve audio files"));
+//                }
+//            }
+//
+//            @Override
+//            public void onFailure(Call<List<AudioFile>> call, Throwable t) {
+//                callback.onFailure(t);
+//            }
+//        });
+//    }
 
     public static void getAllUsers(Context context, Response.Listener<String> responseListener) {
         StringRequest stringRequest = new StringRequest(Request.Method.GET,

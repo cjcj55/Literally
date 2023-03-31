@@ -1,32 +1,37 @@
 package com.cjcj55.literallynot.db;
 
 public class AudioFile {
-    private int id;
-    private int userId;
-    private String dateTime;
-    private String filePath;
+    private String fileName;
+    private String timeSaid;
+    private byte[] audioData;
 
-    public AudioFile(int id, int userId, String dateTime, String filePath) {
-        this.id = id;
-        this.userId = userId;
-        this.dateTime = dateTime;
-        this.filePath = filePath;
+    public AudioFile(String fileName, String timeSaid, byte[] audioData) {
+        this.fileName = fileName;
+        this.timeSaid = timeSaid;
+        this.audioData = audioData;
     }
 
-    public int getId() {
-        return id;
+    public String getFileName() {
+        return fileName;
     }
 
-    public int getUserId() {
-        return userId;
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
     }
 
-    public String getDateTime() {
-        return dateTime;
+    public String getTimeSaid() {
+        return timeSaid;
     }
 
-    public String getFilePath() {
-        return filePath;
+    public void setTimeSaid(String timeSaid) {
+        this.timeSaid = timeSaid;
+    }
+
+    public byte[] getAudioData() {
+        return audioData;
+    }
+
+    public void setAudioData(byte[] audioData) {
+        this.audioData = audioData;
     }
 }
-
