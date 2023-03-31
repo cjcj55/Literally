@@ -12,6 +12,7 @@ import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
 
 import com.cjcj55.literallynot.databinding.MainscreenuiBinding;
+import com.cjcj55.literallynot.db.AudioFile;
 import com.cjcj55.literallynot.db.MySQLHelper;
 import com.facebook.FacebookSdk;
 import com.facebook.share.model.ShareHashtag;
@@ -19,6 +20,11 @@ import com.facebook.share.model.ShareLinkContent;
 import com.facebook.share.widget.ShareButton;
 
 import java.io.File;
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class MainScreen extends Fragment {
 
@@ -32,7 +38,6 @@ public class MainScreen extends Fragment {
 
         binding = MainscreenuiBinding.inflate(inflater, container, false);
         return binding.getRoot();
-
     }
 
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
@@ -111,6 +116,17 @@ public class MainScreen extends Fragment {
             }
         });
 
+//        MySQLHelper.readAudioFiles(getContext(), new Callback<List<AudioFile>>() {
+//            @Override
+//            public void onResponse(Call<List<AudioFile>> call, retrofit2.Response<List<AudioFile>> response) {
+//
+//            }
+//
+//            @Override
+//            public void onFailure(Call<List<AudioFile>> call, Throwable t) {
+//                // handle error
+//            }
+//        });
     }
 
     private void sendPushNotification() {
@@ -123,14 +139,8 @@ public class MainScreen extends Fragment {
     }
 
     private void uploadFile() {
-        // Get the resource ID of the audio file
-        int audioResourceId = getResources().getIdentifier("test_sound", "raw", getActivity().getPackageName());
-
-        // Load the audio file as a Uri object
-        Uri audioUri = Uri.parse("android.resource://" + getActivity().getPackageName() + "/" + audioResourceId);
-
-        File audioFile = new File(audioUri.getPath());
-        MySQLHelper.writeAudioFileForUser(getContext(), audioFile);
+        File file = new File(getActivity().getCacheDir(), "bean.mp3");
+        MySQLHelper.writeAudioFile(getContext(), file);
     }
 
     @Override
@@ -138,5 +148,4 @@ public class MainScreen extends Fragment {
         super.onDestroyView();
         binding = null;
     }
-
 }
