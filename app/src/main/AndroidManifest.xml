@@ -30,6 +30,11 @@
         android:theme="@style/Theme.LiterallyNot"
         android:enableOnBackInvokedCallback="true"
         tools:targetApi="31">
+        <meta-data android:name="com.facebook.sdk.ApplicationId" android:value="@string/facebook_app_id"/>
+        <meta-data android:name="com.facebook.sdk.ClientToken" android:value="@string/facebook_client_token"/>
+        <provider android:authorities="com.facebook.app.FacebookContentProvider228862266326711"
+            android:name="com.facebook.FacebookContentProvider"
+            android:exported="true" />
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -44,5 +49,7 @@
 
         <service android:name=".ForegroundService" />
     </application>
+
+    <uses-permission android:name="com.google.android.gms.permission.AD_ID" tools:node="remove"/>
 
 </manifest>

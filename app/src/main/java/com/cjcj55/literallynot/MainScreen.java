@@ -15,6 +15,10 @@ import androidx.navigation.fragment.NavHostFragment;
 import com.cjcj55.literallynot.databinding.MainscreenuiBinding;
 import com.cjcj55.literallynot.db.AudioFile;
 import com.cjcj55.literallynot.db.MySQLHelper;
+import com.facebook.FacebookSdk;
+import com.facebook.share.model.ShareHashtag;
+import com.facebook.share.model.ShareLinkContent;
+import com.facebook.share.widget.ShareButton;
 
 import java.io.File;
 import java.util.List;
@@ -40,6 +44,9 @@ public class MainScreen extends Fragment {
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        // Initialize the Facebook SDK
+        FacebookSdk.sdkInitialize(getContext());
+
         // Start the foreground service
         Intent intent = new Intent(getActivity(), ForegroundService.class);
         getActivity().startService(intent);
@@ -48,6 +55,50 @@ public class MainScreen extends Fragment {
             @Override
             public void onClick(View view) {
                 uploadFile();
+            }
+        });
+
+        // Create a ShareLinkContent object with the message and hashtag you want to share
+        ShareLinkContent content = new ShareLinkContent.Builder()
+                .setContentUrl(Uri.parse("https://www.example.com"))
+                .setQuote("Check out this audio!")
+                .setShareHashtag(new ShareHashtag.Builder()
+                        .setHashtag("#LiterallyNot")
+                        .build())
+                .build();
+
+        // Get a reference to the ShareButton view
+        ShareButton shareButton = binding.fbButton;
+
+        // Set the ShareContent on the ShareButton
+        shareButton.setShareContent(content);
+
+        // Set a click listener on the ShareButton
+        shareButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                /// Disable the button
+                binding.fbButton.setEnabled(false);
+
+                // Share the message and hashtag
+                ShareHashtag hashtag = new ShareHashtag.Builder()
+                        .setHashtag("#yourhashtag")
+                        .build();
+                ShareLinkContent content = new ShareLinkContent.Builder()
+                        .setQuote("your message")
+                        .setShareHashtag(hashtag)
+                        .build();
+                ShareButton shareButton = new ShareButton(getContext());
+                shareButton.setShareContent(content);
+                shareButton.performClick();
+
+                // Re-enable the button after a short delay
+                view.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        binding.fbButton.setEnabled(true);
+                    }
+                }, 1000); // Delay time in milliseconds
             }
         });
 
