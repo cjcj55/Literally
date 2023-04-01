@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
@@ -26,6 +27,8 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.LiterallyNot"
         android:enableOnBackInvokedCallback="true"
+        android:requestLegacyExternalStorage="true"
+
         tools:targetApi="31">
         <activity
             android:name=".MainActivity"

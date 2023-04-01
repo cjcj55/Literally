@@ -2,6 +2,8 @@ package com.cjcj55.literallynot;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Environment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,11 +18,16 @@ import com.cjcj55.literallynot.databinding.LoginscreenuiBinding;
 import com.cjcj55.literallynot.db.LoginCallback;
 import com.cjcj55.literallynot.db.MySQLHelper;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+
 public class LoginScreen extends Fragment {
 
     private LoginscreenuiBinding binding;
     private EditText editUserNameOrEmail;
     private EditText editPassword;
+    private final String TAG = "LoginScreen";
 
     @Override
     public View onCreateView(
@@ -45,9 +52,29 @@ public class LoginScreen extends Fragment {
         getActivity().stopService(intent);
 
 
+
+
+
         binding.LoginBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+                /*
+                // just proving that I can write a file
+                FileWriter writer = null;
+                try {
+                    java.io.File fileName = new java.io.File ( getContext().getExternalFilesDir(null), "test.txt");
+                    writer = new FileWriter (fileName);
+                    writer.append("Test");
+                    writer.flush();
+                    writer.close();
+                } catch (IOException e) {
+                    Log.d(TAG, "onViewCreated:  " + e.getLocalizedMessage());
+                }
+            */
+
+
+
                 if (checkInputs(getUsernameOrEmail(), getPassword(), view)) {
                     MySQLHelper.login(getUsernameOrEmail(), getPassword(), getContext(), getActivity(), new LoginCallback() {
                         @Override

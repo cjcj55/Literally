@@ -1,7 +1,6 @@
 package com.cjcj55.literallynot;
 
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,8 +13,6 @@ import androidx.navigation.fragment.NavHostFragment;
 
 import com.cjcj55.literallynot.databinding.MainscreenuiBinding;
 import com.cjcj55.literallynot.db.MySQLHelper;
-
-import java.io.File;
 
 public class MainScreen extends Fragment {
 
@@ -43,7 +40,7 @@ public class MainScreen extends Fragment {
         binding.sendNotificationButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                uploadFile();
+                sendPushNotification();
             }
         });
 
@@ -72,17 +69,6 @@ public class MainScreen extends Fragment {
             // Call the createNotification() method on the activity reference
             activity.createNotification();
         }
-    }
-
-    private void uploadFile() {
-        // Get the resource ID of the audio file
-        int audioResourceId = getResources().getIdentifier("test_sound", "raw", getActivity().getPackageName());
-
-        // Load the audio file as a Uri object
-        Uri audioUri = Uri.parse("android.resource://" + getActivity().getPackageName() + "/" + audioResourceId);
-
-        File audioFile = new File(audioUri.getPath());
-        MySQLHelper.writeAudioFileForUser(getContext(), audioFile);
     }
 
     @Override
