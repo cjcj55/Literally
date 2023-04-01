@@ -150,7 +150,6 @@ public class ForegroundService extends Service {
             String text = recognizeSpeech(mAudioData);
             System.out.println("Run called, checking for keyword");
             System.out.println("HERETEST2" + mAudioData.length);
-            saveAudioToFile(mAudioData,getOutputFilePath());
             if (text.contains(KEYWORD)) {
                 long keywordTimestamp = getTimestampForKeyword(text, KEYWORD);
                 byte[] keywordAudioData = getAudioDataForTimestamp(keywordTimestamp);
@@ -205,7 +204,10 @@ public class ForegroundService extends Service {
                     @Override
                     public void onPartialResults(Bundle partialResults) {
                         System.out.println("OnPartial");
-
+                        for (String key : partialResults.keySet()) {
+                            Object value = partialResults.get(key);
+                            System.out.println("HERE DUMBASS: " + String.format("%s = %s (%s)", key, value.toString(), value.getClass().getName()));
+                        }
                     }
 
                     @Override
