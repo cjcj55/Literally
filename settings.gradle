@@ -16,3 +16,4 @@ dependencyResolutionManagement {
 rootProject.name = "LiterallyNot"
 include ':app'
 include ':LAME'
+include ':models'

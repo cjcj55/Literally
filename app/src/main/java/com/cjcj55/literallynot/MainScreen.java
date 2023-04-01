@@ -24,6 +24,8 @@ import com.facebook.share.model.ShareHashtag;
 import com.facebook.share.model.ShareLinkContent;
 import com.facebook.share.widget.ShareButton;
 
+import org.vosk.android.StorageService;
+
 import java.io.File;
 import java.util.List;
 
@@ -55,6 +57,8 @@ public class MainScreen extends Fragment {
         Intent intent = new Intent(getActivity(), ForegroundService.class);
         getActivity().startService(intent);
 
+
+
         binding.sendNotificationButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -73,6 +77,9 @@ public class MainScreen extends Fragment {
 
         // Get a reference to the ShareButton view
         ShareButton shareButton = binding.fbButton;
+
+
+
 
         // Set the ShareContent on the ShareButton
         shareButton.setShareContent(content);

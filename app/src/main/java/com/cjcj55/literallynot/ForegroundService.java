@@ -1,60 +1,59 @@
 package com.cjcj55.literallynot;
 
-import static android.app.Service.START_STICKY;
-
 import android.Manifest;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.AssetFileDescriptor;
+import android.content.res.AssetManager;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
-import android.media.MediaCodec;
-import android.media.MediaCodecInfo;
-import android.media.MediaFormat;
 import android.media.MediaRecorder;
 import android.os.Build;
-import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.IBinder;
-import android.speech.RecognitionListener;
-import android.speech.RecognizerIntent;
+
 import android.speech.SpeechRecognizer;
 import android.util.Log;
 
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
-import androidx.core.app.NotificationCompat;
-import androidx.core.content.ContextCompat;
 
-import com.cjcj55.literallynot.R;
 import com.naman14.androidlame.AndroidLame;
 import com.naman14.androidlame.LameBuilder;
 
-import java.io.BufferedOutputStream;
+import org.vosk.LogLevel;
+import org.vosk.Model;
+import org.vosk.Recognizer;
+import org.vosk.android.StorageService;
+
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.util.ArrayList;
+import java.nio.ShortBuffer;
 import java.util.Arrays;
-import java.util.Locale;
 
 public class ForegroundService extends Service {
 
+
+    private Model mModel;
     private static final String TAG = "ForegroundService";
     private static final int SAMPLE_RATE = 44100;
-    private static final int BUFFER_SIZE = SAMPLE_RATE * 25; // 25 seconds of audio buffer
+    private static final int BUFFER_SIZE = SAMPLE_RATE * 10; //10 seconds of audio buffer
     private static final int AUDIO_FORMAT = AudioFormat.ENCODING_PCM_16BIT;
     private static final int CHANNEL_CONFIG = AudioFormat.CHANNEL_IN_MONO;
     private static final String KEYWORD = "literally";
-    private static final int KEYWORD_CONTEXT_TIME = 5000; // 5 seconds before and after the keyword
+    private static final int KEYWORD_CONTEXT_TIME = 2000; // 2 seconds before and after the keyword
     private static final String CHANNEL_ID = "test";
 
     private AudioRecord mAudioRecord;
@@ -68,6 +67,15 @@ public class ForegroundService extends Service {
         super.onCreate();
 
 
+        // Initialize the Vosk model
+        Model model = ModelManager.getInstance().getModel();
+        if (model != null) {
+            // use the model
+            mModel = model;
+        } else {
+            // handle error
+            System.out.println("No model loaded..?");
+        }
 
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
@@ -108,6 +116,7 @@ public class ForegroundService extends Service {
         return START_STICKY;
     }
 
+
     @Override
     public void onDestroy() {
         super.onDestroy();
@@ -124,10 +133,8 @@ public class ForegroundService extends Service {
         public void run() {
             System.out.println("AudioBuffer run()");
             byte[] buffer = new byte[BUFFER_SIZE];
-            while (true) {
+            while (mAudioRecord.getRecordingState() == AudioRecord.RECORDSTATE_RECORDING) { //check if mAudioRecord is still recording before attempting to read from it,
                 int bytesRead = mAudioRecord.read(buffer, 0, buffer.length);
-                int bytesWritten = mAudioBuffer.write(buffer, 0, bytesRead);
-                System.out.println("Bytes written to buffer: " + bytesWritten);
                 mAudioBuffer.write(buffer, 0, bytesRead);
                 mHandler.post(new RecognizeSpeechTask(mAudioBuffer.readAll()));
             }
@@ -138,126 +145,102 @@ public class ForegroundService extends Service {
         private final byte[] mAudioData;
         private String mText;
 
-
         RecognizeSpeechTask(byte[] audioData) {
-            System.out.println("RECO SPEECH TASK " + audioData.length);
             mAudioData = audioData;
         }
 
         @Override
         public void run() {
-            System.out.println("HERETEST1" + mAudioData.length);
-            String text = recognizeSpeech(mAudioData);
-            System.out.println("Run called, checking for keyword");
-            System.out.println("HERETEST2" + mAudioData.length);
-            if (text.contains(KEYWORD)) {
+            String text = null;
+            text = recognizeSpeech(mAudioData);
+            if (text.contains(KEYWORD) || text.contains("hello")) {
                 long keywordTimestamp = getTimestampForKeyword(text, KEYWORD);
+                System.out.println("TESTINGMAIN1" + keywordTimestamp);
                 byte[] keywordAudioData = getAudioDataForTimestamp(keywordTimestamp);
+                System.out.println("TESTINGMAIN2" + keywordAudioData.length);
                 saveAudioToFile(keywordAudioData, getOutputFilePath());
             }
         }
 
 
-        private String recognizeSpeech(byte[] audioData) {
-            mText = "";
-            if (audioData.length > 0) {
-                mSpeechRecognizer.setRecognitionListener(new RecognitionListener() {
-                    @Override
-                    public void onReadyForSpeech(Bundle bundle) {
-                        System.out.println("OnReady");
-                    }
-
-                    @Override
-                    public void onBeginningOfSpeech() {
-                        System.out.println("OnBegining");
-
-                    }
-
-                    @Override
-                    public void onRmsChanged(float v) {
-                    }
-
-                    @Override
-                    public void onBufferReceived(byte[] bytes) {
-                    }
-
-                    @Override
-                    public void onEndOfSpeech() {
-                        System.out.println("onEnd");
-
-                    }
-
-                    @Override
-                    public void onError(int error) {
-                        System.out.println("onError " + error);
-                    }
-
-                    @Override
-                    public void onResults(Bundle results) {
-                        ArrayList<String> voiceResults = results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
-                        if (voiceResults != null && voiceResults.size() > 0) {
-                            mText = voiceResults.get(0);
-                            System.out.println("onResult: " + mText);
+        public String recognizeSpeech(byte[] audioData) {
+            StringBuilder result = new StringBuilder();
+            System.out.println(audioData.length);
+            try (final ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(audioData)) {
+                final Recognizer rec = new Recognizer(mModel, SAMPLE_RATE);
+                final BufferedInputStream bis = new BufferedInputStream(byteArrayInputStream);
+                final byte[] buff = new byte[4096];
+                int len;
+                while ((len = bis.read(buff)) != -1) {
+                    if (rec.acceptWaveForm(buff, len)) {
+                        final var res = rec.getResult();
+                        if (res != null) {
+                            result.append(res.toLowerCase()).append(" ");
                         }
                     }
-
-                    @Override
-                    public void onPartialResults(Bundle partialResults) {
-                        System.out.println("OnPartial");
-                        for (String key : partialResults.keySet()) {
-                            Object value = partialResults.get(key);
-                            System.out.println("HERE DUMBASS: " + String.format("%s = %s (%s)", key, value.toString(), value.getClass().getName()));
-                        }
-                    }
-
-                    @Override
-                    public void onEvent(int eventType, Bundle params) {
-                        System.out.println("OnEvent");
-
-                    }
-                });
-                Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
-                intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
-                intent.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 1);
-                intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault());
-                intent.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_MINIMUM_LENGTH_MILLIS, 2000);
-                intent.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_COMPLETE_SILENCE_LENGTH_MILLIS, 3000);
-                intent.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_POSSIBLY_COMPLETE_SILENCE_LENGTH_MILLIS, 3000);
-                mSpeechRecognizer.startListening(intent);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-            return mText;
+            System.out.println("VOICE RESULT: " + result.toString().trim());
+            return result.toString().trim();
         }
-    }
+
+
+
+//TODO: EVERYTHING DOWN HERE IS FUCKED UP SOMEHOW, NOT RETRIEVING CORRECT CONTEXT AND GIVING 0 BYTE FILE
+        //THE MP3 CONVERSION WORKS PERFECTLY FINE, USE getOutputFilePath(),
+        //VOSK WORKS FINE ITS JUST REAL BAD SINCE ITS ONLY A 50MB MODEL
+        //THE PIECES ARE HERE JUST NEED FIXED
+
+
+
 
     private long getTimestampForKeyword(String text, String keyword) {
         int startIndex = text.indexOf(keyword);
+        System.out.println("Testing9" + startIndex);
         long keywordStartTime = getAudioTimestampForTextIndex(text, startIndex);
         long keywordEndTime = keywordStartTime + KEYWORD_CONTEXT_TIME;
+        System.out.println("Testgin10" + keywordEndTime);
         return keywordEndTime;
     }
 
-    private long getAudioTimestampForTextIndex(String text, int index) {
-        int numSamples = index * SAMPLE_RATE / 1000;
-        return (long) numSamples * 1000 / SAMPLE_RATE;
-    }
+        private long getAudioTimestampForTextIndex(String text, int index) {
+            System.out.println("Testing6" + index);
+            System.out.println("Testing7" + text);
+            double numSamples = index * 1.0 * SAMPLE_RATE / 1000.0;
+            System.out.println("Testing8" + numSamples);
+            return (long) (numSamples * 1000.0 / SAMPLE_RATE);
+        }
 
     private byte[] getAudioDataForTimestamp(long timestamp) {
         byte[] audioData = mAudioBuffer.readAll();
+        System.out.println("Testing2.5" + audioData.length);
+        System.out.println("Testing3" + timestamp);
         int startIndex = getIndexForAudioTimestamp(audioData.length, timestamp - KEYWORD_CONTEXT_TIME);
+        System.out.println("STARTINDEX: " + startIndex);
         int endIndex = getIndexForAudioTimestamp(audioData.length, timestamp + KEYWORD_CONTEXT_TIME);
+        System.out.println("ENDINDEX: "  + endIndex);
         return Arrays.copyOfRange(audioData, startIndex, endIndex);
     }
 
     private int getIndexForAudioTimestamp(int audioLength, long timestamp) {
         System.out.println("getIndexForAudioTimestamp");
+        System.out.println("AUDIOLENGTH: " + audioLength);
+        System.out.println("TIMESTAMP: " + timestamp);
         int numSamples = (int) (timestamp * SAMPLE_RATE / 1000);
+        System.out.println("NUMSAMPLES: " + numSamples);
         int numBytes = numSamples * 2;
+        System.out.println("NUMBYTES: " + numBytes);
         int index = audioLength - numBytes;
         if (index < 0) {
             index = 0;
         }
+        System.out.println("FINALINDEX: " + index);
         return index;
     }
+
+}
 
     private void saveAudioToFile(byte[] audioData, String filePath) {
         System.out.println("audiodata" + audioData.length);
@@ -299,20 +282,6 @@ public class ForegroundService extends Service {
         return new File(dir, "recorded_audio_" + System.currentTimeMillis() + ".mp3").getAbsolutePath();
     }
 
-    private Notification buildNotification() {
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "channel_id")
-                .setContentTitle("Foreground Service")
-                .setContentText("Recording audio...")
-                .setSmallIcon(R.drawable.ic_launcher_background)
-                .setPriority(NotificationCompat.PRIORITY_HIGH)
-                .setCategory(NotificationCompat.CATEGORY_SERVICE)
-                .setOngoing(true);
-        Intent stopIntent = new Intent(this, ForegroundService.class);
-        stopIntent.setAction("stop");
-        PendingIntent pendingIntent = PendingIntent.getService(this, 0, stopIntent, 0);
-        builder.addAction(R.drawable.ic_launcher_background, "Stop", pendingIntent);
-        return builder.build();
-    }
 
     @Nullable
     @Override
