@@ -1,6 +1,8 @@
+
 plugins {
     id 'com.android.application'
 }
+
 
 android {
     namespace 'com.cjcj55.literallynot'
@@ -63,4 +65,6 @@ dependencies {
     implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
     implementation 'com.facebook.android:facebook-android-sdk:[8,9)'
     implementation 'com.facebook.android:facebook-share:[5,6)'
+    implementation 'com.github.naman14:TAndroidLame:1.1'
+
 }
