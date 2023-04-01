@@ -52,12 +52,13 @@ public class ForegroundService extends Service {
     private Model mModel;
     private static final String TAG = "ForegroundService";
     private static final int SAMPLE_RATE = 44100;
-    private static final int BUFFER_SIZE = SAMPLE_RATE * 10; //10 seconds of audio buffer
+    private static final int BUFFER_SIZE = SAMPLE_RATE * 10; //25 seconds of audio buffer
+    //^^ CHANGE THIS TO CHANGE SIZE OF BUFFER(* 25 = 12 SECOND TOTAL KEYWORD, *10 = 4 SECOND AUDIO FILES ETC)
     private static final int AUDIO_FORMAT = AudioFormat.ENCODING_PCM_16BIT;
     private static final int CHANNEL_CONFIG = AudioFormat.CHANNEL_IN_MONO;
     private static final String KEYWORD = "literally";
-    private static final int KEYWORD_CONTEXT_TIME = 2000; // 5 seconds before and after the keyword
-    //^ NOT USED CURRENTLY
+    private static final int KEYWORD_CONTEXT_TIME = 2000; // 2 seconds before and after the keyword
+    //^ NOT USED CURRENTLY ;(
     private static final String CHANNEL_ID = "test";
 
     private AudioRecord mAudioRecord;
@@ -138,6 +139,7 @@ public class ForegroundService extends Service {
             System.out.println("AudioBuffer run()");
             byte[] buffer = new byte[BUFFER_SIZE];
             while (mAudioRecord.getRecordingState() == AudioRecord.RECORDSTATE_RECORDING) { //check if mAudioRecord is still recording before attempting to read from it,
+                System.out.println("READING...WRITING AUDIO TO BUFFER.");
                 int bytesRead = mAudioRecord.read(buffer, 0, buffer.length);
                 mAudioBuffer.write(buffer, 0, bytesRead);
                 mHandler.post(new RecognizeSpeechTask(mAudioBuffer.readAll()));

@@ -56,7 +56,7 @@ public class LoginScreen extends Fragment {
         ModelManager.getInstance().initModel(requireContext(), new ModelManager.Callback() {
             @Override
             public void onSuccess() {
-                System.out.println("model files loading!");
+                System.out.println("models finished loading!");
                 // handle success
             }
 
