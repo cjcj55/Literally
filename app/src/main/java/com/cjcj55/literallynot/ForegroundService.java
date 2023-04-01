@@ -12,6 +12,9 @@ import android.content.res.AssetManager;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -53,7 +56,8 @@ public class ForegroundService extends Service {
     private static final int AUDIO_FORMAT = AudioFormat.ENCODING_PCM_16BIT;
     private static final int CHANNEL_CONFIG = AudioFormat.CHANNEL_IN_MONO;
     private static final String KEYWORD = "literally";
-    private static final int KEYWORD_CONTEXT_TIME = 2000; // 2 seconds before and after the keyword
+    private static final int KEYWORD_CONTEXT_TIME = 2000; // 5 seconds before and after the keyword
+    //^ NOT USED CURRENTLY
     private static final String CHANNEL_ID = "test";
 
     private AudioRecord mAudioRecord;
@@ -143,6 +147,7 @@ public class ForegroundService extends Service {
 
     private class RecognizeSpeechTask implements Runnable {
         private final byte[] mAudioData;
+        private byte[] mSavedAudioData; //The data that contains the keyword
         private String mText;
 
         RecognizeSpeechTask(byte[] audioData) {
@@ -154,11 +159,16 @@ public class ForegroundService extends Service {
             String text = null;
             text = recognizeSpeech(mAudioData);
             if (text.contains(KEYWORD) || text.contains("hello")) {
-                long keywordTimestamp = getTimestampForKeyword(text, KEYWORD);
-                System.out.println("TESTINGMAIN1" + keywordTimestamp);
-                byte[] keywordAudioData = getAudioDataForTimestamp(keywordTimestamp);
-                System.out.println("TESTINGMAIN2" + keywordAudioData.length);
-                saveAudioToFile(keywordAudioData, getOutputFilePath());
+                // Play notification sound
+                Uri notificationSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+                Ringtone ringtone = RingtoneManager.getRingtone(getApplicationContext(), notificationSound);
+                ringtone.play();
+               // mSavedAudioData=mAudioData;
+               // long keywordTimestamp = getTimestampForKeyword(text, KEYWORD);
+              //  System.out.println("TESTINGMAIN1" + keywordTimestamp);
+              //  byte[] keywordAudioData = getAudioDataForTimestamp(keywordTimestamp);
+              //  System.out.println("TESTINGMAIN2" + keywordAudioData.length);
+                saveAudioToFile(mAudioData, getOutputFilePath());
             }
         }
 
@@ -213,18 +223,32 @@ public class ForegroundService extends Service {
             return (long) (numSamples * 1000.0 / SAMPLE_RATE);
         }
 
-    private byte[] getAudioDataForTimestamp(long timestamp) {
-        byte[] audioData = mAudioBuffer.readAll();
-        System.out.println("Testing2.5" + audioData.length);
-        System.out.println("Testing3" + timestamp);
-        int startIndex = getIndexForAudioTimestamp(audioData.length, timestamp - KEYWORD_CONTEXT_TIME);
-        System.out.println("STARTINDEX: " + startIndex);
-        int endIndex = getIndexForAudioTimestamp(audioData.length, timestamp + KEYWORD_CONTEXT_TIME);
-        System.out.println("ENDINDEX: "  + endIndex);
-        return Arrays.copyOfRange(audioData, startIndex, endIndex);
-    }
+        private byte[] getAudioDataForTimestamp(long timestamp) {
+            saveAudioToFile(mAudioData,getOutputFilePath());
+            byte[] audioData = mAudioData;
+            int startIndex = 0;
+            int endIndex = audioData.length;
 
-    private int getIndexForAudioTimestamp(int audioLength, long timestamp) {
+            int contextSize = KEYWORD_CONTEXT_TIME * SAMPLE_RATE / 1000; // convert time to sample count
+            int timestampIndex = (int) (timestamp * SAMPLE_RATE / 1000); // convert timestamp to sample index
+
+            // Adjust start/end indices based on context size and requested timestamp
+            startIndex = Math.max(0, timestampIndex - contextSize);
+            endIndex = Math.min(audioData.length, timestampIndex + contextSize);
+
+            // If requested timestamp is beyond the bounds of the audio data, adjust start/end indices accordingly
+            if (startIndex == 0 && endIndex == audioData.length) {
+                if (timestampIndex < 0) {
+                    endIndex = Math.min(contextSize, audioData.length);
+                } else if (timestampIndex >= audioData.length) {
+                    startIndex = Math.max(0, audioData.length - contextSize);
+                }
+            }
+
+            return Arrays.copyOfRange(audioData, startIndex, endIndex);
+        }
+
+   /* private int getIndexForAudioTimestamp(int audioLength, long timestamp) {
         System.out.println("getIndexForAudioTimestamp");
         System.out.println("AUDIOLENGTH: " + audioLength);
         System.out.println("TIMESTAMP: " + timestamp);
@@ -238,7 +262,7 @@ public class ForegroundService extends Service {
         }
         System.out.println("FINALINDEX: " + index);
         return index;
-    }
+    }*/
 
 }
 
