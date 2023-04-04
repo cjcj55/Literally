@@ -52,7 +52,7 @@ public class ForegroundService extends Service {
     private Model mModel;
     private static final String TAG = "ForegroundService";
     private static final int SAMPLE_RATE = 44100;
-    private static final int BUFFER_SIZE = SAMPLE_RATE * 10; //25 seconds of audio buffer
+    private static final int BUFFER_SIZE = SAMPLE_RATE * 15; //25 seconds of audio buffer
     //^^ CHANGE THIS TO CHANGE SIZE OF BUFFER(* 25 = 12 SECOND TOTAL KEYWORD, *10 = 4 SECOND AUDIO FILES ETC)
     private static final int AUDIO_FORMAT = AudioFormat.ENCODING_PCM_16BIT;
     private static final int CHANNEL_CONFIG = AudioFormat.CHANNEL_IN_MONO;
@@ -159,6 +159,7 @@ public class ForegroundService extends Service {
         @Override
         public void run() {
             String text = null;
+
             text = recognizeSpeech(mAudioData);
             if (text.contains(KEYWORD) || text.contains("hello")) {
                 // Play notification sound
@@ -174,14 +175,15 @@ public class ForegroundService extends Service {
             }
         }
 
-
         public String recognizeSpeech(byte[] audioData) {
+            System.out.println("AUDIODATA RECIEVED FOR SPEECH");
+            saveAudioToFile(audioData,getOutputFilePath());
             StringBuilder result = new StringBuilder();
             System.out.println(audioData.length);
             try (final ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(audioData)) {
                 final Recognizer rec = new Recognizer(mModel, SAMPLE_RATE);
                 final BufferedInputStream bis = new BufferedInputStream(byteArrayInputStream);
-                final byte[] buff = new byte[4096];
+                final byte[] buff = new byte[2048];
                 int len;
                 while ((len = bis.read(buff)) != -1) {
                     if (rec.acceptWaveForm(buff, len)) {
@@ -197,75 +199,6 @@ public class ForegroundService extends Service {
             System.out.println("VOICE RESULT: " + result.toString().trim());
             return result.toString().trim();
         }
-
-
-
-//TODO: EVERYTHING DOWN HERE IS FUCKED UP SOMEHOW, NOT RETRIEVING CORRECT CONTEXT AND GIVING 0 BYTE FILE
-        //THE MP3 CONVERSION WORKS PERFECTLY FINE, USE getOutputFilePath(),
-        //VOSK WORKS FINE ITS JUST REAL BAD SINCE ITS ONLY A 50MB MODEL
-        //THE PIECES ARE HERE JUST NEED FIXED
-
-
-
-
-    private long getTimestampForKeyword(String text, String keyword) {
-        int startIndex = text.indexOf(keyword);
-        System.out.println("Testing9" + startIndex);
-        long keywordStartTime = getAudioTimestampForTextIndex(text, startIndex);
-        long keywordEndTime = keywordStartTime + KEYWORD_CONTEXT_TIME;
-        System.out.println("Testgin10" + keywordEndTime);
-        return keywordEndTime;
-    }
-
-        private long getAudioTimestampForTextIndex(String text, int index) {
-            System.out.println("Testing6" + index);
-            System.out.println("Testing7" + text);
-            double numSamples = index * 1.0 * SAMPLE_RATE / 1000.0;
-            System.out.println("Testing8" + numSamples);
-            return (long) (numSamples * 1000.0 / SAMPLE_RATE);
-        }
-
-        private byte[] getAudioDataForTimestamp(long timestamp) {
-            saveAudioToFile(mAudioData,getOutputFilePath());
-            byte[] audioData = mAudioData;
-            int startIndex = 0;
-            int endIndex = audioData.length;
-
-            int contextSize = KEYWORD_CONTEXT_TIME * SAMPLE_RATE / 1000; // convert time to sample count
-            int timestampIndex = (int) (timestamp * SAMPLE_RATE / 1000); // convert timestamp to sample index
-
-            // Adjust start/end indices based on context size and requested timestamp
-            startIndex = Math.max(0, timestampIndex - contextSize);
-            endIndex = Math.min(audioData.length, timestampIndex + contextSize);
-
-            // If requested timestamp is beyond the bounds of the audio data, adjust start/end indices accordingly
-            if (startIndex == 0 && endIndex == audioData.length) {
-                if (timestampIndex < 0) {
-                    endIndex = Math.min(contextSize, audioData.length);
-                } else if (timestampIndex >= audioData.length) {
-                    startIndex = Math.max(0, audioData.length - contextSize);
-                }
-            }
-
-            return Arrays.copyOfRange(audioData, startIndex, endIndex);
-        }
-
-   /* private int getIndexForAudioTimestamp(int audioLength, long timestamp) {
-        System.out.println("getIndexForAudioTimestamp");
-        System.out.println("AUDIOLENGTH: " + audioLength);
-        System.out.println("TIMESTAMP: " + timestamp);
-        int numSamples = (int) (timestamp * SAMPLE_RATE / 1000);
-        System.out.println("NUMSAMPLES: " + numSamples);
-        int numBytes = numSamples * 2;
-        System.out.println("NUMBYTES: " + numBytes);
-        int index = audioLength - numBytes;
-        if (index < 0) {
-            index = 0;
-        }
-        System.out.println("FINALINDEX: " + index);
-        return index;
-    }*/
-
 }
 
     private void saveAudioToFile(byte[] audioData, String filePath) {
@@ -296,12 +229,6 @@ public class ForegroundService extends Service {
             Log.e(TAG, "Error saving audio to file: " + e.getMessage());
         }
     }
-
-
-
-
-
-
     private String getOutputFilePath() {
         System.out.println("getting outputfile path");
         File dir = getCacheDir();

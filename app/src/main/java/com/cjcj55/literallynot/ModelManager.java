@@ -22,7 +22,7 @@ public class ModelManager {
     }
 
     public void initModel(Context context, Callback callback) {
-        StorageService.unpack(context, "model-en-us", "model",
+        StorageService.unpack(context, "vosk-model-en-us-0.22-lgraph", "model",
                 (model) -> {
                     this.model = model;
                     callback.onSuccess();
