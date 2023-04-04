@@ -38,6 +38,19 @@ public class ReportScreen extends Fragment {
                         .navigate(R.id.action_ReportScreen_to_MainScreen);
             }
         });
+        binding.imageButton3.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                NavHostFragment.findNavController(ReportScreen.this)
+                        .navigate(R.id.action_ReportScreen_to_MainScreen);
+            }
+        });
+        binding.logoutButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                MySQLHelper.logout(getContext(), ReportScreen.this);
+            }
+        });
 
 
         // Make the network request to get all users
