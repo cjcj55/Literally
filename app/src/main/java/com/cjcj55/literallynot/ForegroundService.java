@@ -52,6 +52,7 @@ public class ForegroundService extends Service {
     private Model mModel;
     private static final String TAG = "ForegroundService";
     private static final int SAMPLE_RATE = 44100;
+    
     private static final int BUFFER_SIZE = SAMPLE_RATE * 15; //25 seconds of audio buffer
     //^^ CHANGE THIS TO CHANGE SIZE OF BUFFER(* 25 = 12 SECOND TOTAL KEYWORD, *10 = 4 SECOND AUDIO FILES ETC)
     private static final int AUDIO_FORMAT = AudioFormat.ENCODING_PCM_16BIT;
@@ -161,7 +162,7 @@ public class ForegroundService extends Service {
             String text = null;
 
             text = recognizeSpeech(mAudioData);
-            if (text.contains(KEYWORD) || text.contains("hello")) {
+            if (text.contains(KEYWORD)) {
                 // Play notification sound
                 Uri notificationSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
                 Ringtone ringtone = RingtoneManager.getRingtone(getApplicationContext(), notificationSound);
