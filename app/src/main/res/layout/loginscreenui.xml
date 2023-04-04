@@ -5,20 +5,20 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".LoginScreen">
+
     <EditText
         android:id="@+id/editTextTextPassword"
         android:layout_width="300dp"
         android:layout_height="48dp"
-        android:layout_marginBottom="44dp"
         android:autofillHints="true"
         android:ems="10"
         android:hint="Password"
         android:inputType="textPassword"
         android:textColorHint="#7E7878"
-        app:layout_constraintBottom_toTopOf="@+id/LoginBtn"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.495"
-        app:layout_constraintStart_toStartOf="parent" />
+        tools:layout_editor_absoluteX="55dp"
+        tools:layout_editor_absoluteY="442dp"
+        tools:ignore="MissingConstraints" />
+
     <TextView
         android:id="@+id/username_error_text"
         android:layout_width="wrap_content"
@@ -26,10 +26,8 @@
         android:textColor="#FF0000"
         android:textSize="12sp"
         android:visibility="gone"
-        app:layout_constraintTop_toBottomOf="@+id/editUser"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="@+id/editUser"/>
+        tools:ignore="MissingConstraints" />
+
     <TextView
         android:id="@+id/password_error_text"
         android:layout_width="wrap_content"
@@ -37,10 +35,7 @@
         android:textColor="#FF0000"
         android:textSize="12sp"
         android:visibility="gone"
-        app:layout_constraintTop_toBottomOf="@+id/editTextTextPassword"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="@+id/editTextTextPassword"/>
+        tools:ignore="MissingConstraints" />
 
     <EditText
         android:id="@+id/editUser"
@@ -50,40 +45,40 @@
         android:ems="10"
         android:hint="Username or Email"
         android:textColorHint="#7E7878"
-        app:layout_constraintBottom_toTopOf="@+id/editTextTextPassword"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.495"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/LoginScreenHeader" />
-    <TextView
-        android:id="@+id/LoginScreenHeader"
-        android:layout_width="148dp"
-        android:layout_height="85dp"
-        android:text="Literally...Not!"
-        android:textSize="34sp"
-        app:layout_constraintBottom_toTopOf="@id/LoginBtn"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        tools:layout_editor_absoluteX="55dp"
+        tools:layout_editor_absoluteY="346dp"
+        tools:ignore="MissingConstraints" />
 
-    <Button
+
+    <ImageView
+        android:id="@+id/LoginScreenHeader"
+        android:layout_width="360dp"
+        android:layout_height="174dp"
+        android:src="@drawable/literallynot"
+        tools:layout_editor_absoluteX="25dp"
+        tools:layout_editor_absoluteY="29dp"
+        tools:ignore="MissingConstraints" />
+
+
+    <ImageButton
         android:id="@+id/LoginBtn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Login"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/LoginScreenHeader" />
+        android:layout_width="120dp"
+        android:layout_height="64dp"
+
+        android:maxWidth="64dp"
+        android:src="@drawable/loginbutton"
+
+        app:layout_constraintBottom_toTopOf="@+id/ToAccCreationBtn"
+        app:layout_constraintTop_toBottomOf="@+id/editTextTextPassword"
+        tools:layout_editor_absoluteX="145dp"
+        tools:ignore="MissingConstraints" />
 
     <Button
         android:id="@+id/ToAccCreationBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Create Account"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/LoginBtn" />
+        tools:layout_editor_absoluteX="121dp"
+        tools:layout_editor_absoluteY="642dp"
+        tools:ignore="MissingConstraints" />
 </androidx.constraintlayout.widget.ConstraintLayout>
