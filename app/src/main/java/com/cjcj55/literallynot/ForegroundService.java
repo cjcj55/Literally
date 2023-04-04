@@ -178,17 +178,16 @@ public class ForegroundService extends Service {
 
         public String recognizeSpeech(byte[] audioData) {
             System.out.println("AUDIODATA RECIEVED FOR SPEECH");
-            saveAudioToFile(audioData,getOutputFilePath());
             StringBuilder result = new StringBuilder();
             System.out.println(audioData.length);
             try (final ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(audioData)) {
                 final Recognizer rec = new Recognizer(mModel, SAMPLE_RATE);
                 final BufferedInputStream bis = new BufferedInputStream(byteArrayInputStream);
-                final byte[] buff = new byte[2048];
+                final byte[] buff = new byte[4096];
                 int len;
                 while ((len = bis.read(buff)) != -1) {
                     if (rec.acceptWaveForm(buff, len)) {
-                        final var res = rec.getResult();
+                        final var res = rec.getFinalResult();
                         if (res != null) {
                             result.append(res.toLowerCase()).append(" ");
                         }
