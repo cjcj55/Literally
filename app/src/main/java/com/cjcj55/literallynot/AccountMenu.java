@@ -51,23 +51,23 @@ public class AccountMenu extends Fragment {
             if(firstName.length()>=7)
             {
 
-                firstName = "First Name: " +firstName.substring(0, 7) ;
+                firstName = firstName.substring(0, 7) ;
             }
 
-            textView.setText(firstName);
+            textView.setText("First Name: " + firstName);
 
 
             if(lastName.length()>=7)
             {
-                lastName = "Last Name: " +lastName.substring(0, 7) ;
+                lastName =lastName.substring(0, 7) ;
             }
 
-            textViewLastName.setText(lastName);
+            textViewLastName.setText("Last Name: " + lastName);
             if (username.length()>=20)
             {
-                username = "Username: " +username.substring(0,20);
+                username = username.substring(0,20);
             }
-            textViewUsername.setText(username);
+            textViewUsername.setText("Username: " + username);
 
 
 
