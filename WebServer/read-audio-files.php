@@ -1,30 +1,33 @@
 <?php
 require_once 'connect.php';
 
-$userId = $_GET['user_id'];
+// Set the upload directory
+$uploadDir = 'uploads/';
 
-// Retrieve audio files for user ID
-$stmt = $conn->prepare("SELECT * FROM audio_files WHERE user_id = ?");
-$stmt->bind_param("i", $userId);
-$stmt->execute();
-$result = $stmt->get_result();
+// Get the user_id parameter from the function argument
+$user_id = $_POST['user_id'];
 
-// Create array of audio files
+// Query the database for audio files with the given user_id
+$sql = "SELECT * FROM audio_clips WHERE user_id='$user_id'";
+$result = mysqli_query($conn, $sql);
+
+// Create an array to store the audio files
 $audioFiles = array();
-while ($row = $result->fetch_assoc()) {
+
+// Loop through the audio files in the database and add them to the array
+while ($row = mysqli_fetch_assoc($result)) {
+    $fileName = $row['filename'];
+    $filePath = $row['filepath'];
+    $fullPath = $uploadDir . $filePath;
+    $audioData = base64_encode(file_get_contents($fullPath));
     $audioFile = array(
-        'id' => $row['id'],
-        'user_id' => $row['user_id'],
-        'time_said' => $row['time_said'],
-        'file_path' => $row['file_path']
+        'fileName' => $fileName,
+        'audioData' => $audioData
     );
     array_push($audioFiles, $audioFile);
 }
 
-$stmt->close();
-$conn->close();
-
-// Return array of audio files
+// Send the array of audio files as JSON
 header('Content-Type: application/json');
 echo json_encode($audioFiles);
 ?>

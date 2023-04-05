@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.util.Base64;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -234,75 +235,6 @@ public class MySQLHelper {
         });
 
     }
-
-//    public static void readAudioFiles(Context context, Callback<List<AudioFile>> callback) {
-//        String baseUrl = API_URL + "retrieve-audio-files.php/";
-//        SharedPreferences sharedPreferences = context.getSharedPreferences("myAppPrefs", Context.MODE_PRIVATE);
-//        String userId = String.valueOf(sharedPreferences.getInt("user_id", -1));
-//
-//        Retrofit retrofit = new Retrofit.Builder()
-//                .baseUrl(baseUrl)
-//                .addConverterFactory(GsonConverterFactory.create())
-//                .build();
-//
-//        ApiInterface apiInterface = retrofit.create(ApiInterface.class);
-//
-//        Call<List<AudioFile>> call = apiInterface.getAudioFiles(Integer.parseInt(userId));
-//        call.enqueue(new Callback<List<AudioFile>>() {
-//            @Override
-//            public void onResponse(Call<List<AudioFile>> call, retrofit2.Response<List<AudioFile>> response) {
-//                if (response.isSuccessful()) {
-//                    List<AudioFile> audioFiles = new ArrayList<>();
-//                    List<AudioFile> serverAudioFiles = response.body();
-//                    CountDownLatch latch = new CountDownLatch(serverAudioFiles.size());
-//
-//                    for (AudioFile serverAudioFile : serverAudioFiles) {
-//                        String fileName = serverAudioFile.getFileName();
-//                        String timeSaid = serverAudioFile.getTimeSaid();
-//                        apiInterface.getAudioFile(Integer.parseInt(userId), fileName).enqueue(new Callback<ResponseBody>() {
-//                            @Override
-//                            public void onResponse(Call<ResponseBody> call, retrofit2.Response<ResponseBody> response) {
-//                                if (response.isSuccessful()) {
-//                                    try {
-//                                        byte[] audioData = response.body().bytes();
-//                                        AudioFile audioFile = new AudioFile(fileName, timeSaid, audioData);
-//                                        audioFiles.add(audioFile);
-//                                    } catch (IOException e) {
-//                                        e.printStackTrace();
-//                                    }
-//                                } else {
-//                                    // handle error
-//                                }
-//                                latch.countDown();
-//                            }
-//
-//                            @Override
-//                            public void onFailure(Call<ResponseBody> call, Throwable t) {
-//                                // handle error
-//                                latch.countDown();
-//                            }
-//                        });
-//                    }
-//
-//                    try {
-//                        latch.await(); // wait for all requests to finish
-//                    } catch (InterruptedException e) {
-//                        e.printStackTrace();
-//                    }
-//
-//                    Response<List<AudioFile>> retrofitResponse = Response.success(audioFiles);
-//                    callback.onResponse(retrofitResponse);
-//                } else {
-//                    callback.onFailure(new Throwable("Failed to retrieve audio files"));
-//                }
-//            }
-//
-//            @Override
-//            public void onFailure(Call<List<AudioFile>> call, Throwable t) {
-//                callback.onFailure(t);
-//            }
-//        });
-//    }
 
     public static void getAllUsers(Context context, Response.Listener<String> responseListener) {
         StringRequest stringRequest = new StringRequest(Request.Method.GET,
