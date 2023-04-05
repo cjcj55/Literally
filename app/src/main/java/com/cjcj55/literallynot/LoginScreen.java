@@ -187,4 +187,5 @@ public class LoginScreen extends Fragment {
         return isPermissionGranted;
     }
 
+
 }
