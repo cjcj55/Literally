@@ -184,10 +184,12 @@ public class ForegroundService extends Service {
                 final Recognizer rec = new Recognizer(mModel, SAMPLE_RATE);
                 final BufferedInputStream bis = new BufferedInputStream(byteArrayInputStream);
                 final byte[] buff = new byte[4096];
+
                 int len;
                 while ((len = bis.read(buff)) != -1) {
                     if (rec.acceptWaveForm(buff, len)) {
                         final var res = rec.getFinalResult();
+                        //??>>getFinalResult() OR getResult() OR getPartialResults()
                         if (res != null) {
                             result.append(res.toLowerCase()).append(" ");
                         }
