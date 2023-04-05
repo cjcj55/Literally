@@ -48,7 +48,8 @@ public class ReportScreen extends Fragment {
         binding.logoutButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                MySQLHelper.logout(getContext(), ReportScreen.this);
+                NavHostFragment.findNavController(ReportScreen.this)
+                        .navigate(R.id.action_ReportScreen_to_accountMenu);
             }
         });
 
