@@ -6,9 +6,7 @@ import android.app.PendingIntent;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.content.pm.Signature;
 import android.media.AudioAttributes;
 import android.net.Uri;
 import android.os.Build;
@@ -27,14 +25,12 @@ import androidx.navigation.ui.NavigationUI;
 
 import com.cjcj55.literallynot.databinding.ActivityMainBinding;
 
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
+import org.vosk.android.StorageService;
+
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
@@ -69,7 +65,11 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
+
+
     }
+
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -190,10 +190,6 @@ public class MainActivity extends AppCompatActivity {
                 ActivityCompat.requestPermissions(this, permissionsToRequest.toArray(new String[0]), PERMISSION_REQUEST_CODE);
             }
         }
-
     }
 
-
-
-    }
-
+}

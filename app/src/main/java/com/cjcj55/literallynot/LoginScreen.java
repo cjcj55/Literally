@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.AssetManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -23,8 +24,11 @@ import com.cjcj55.literallynot.db.AudioUploadCallback;
 import com.cjcj55.literallynot.db.LoginCallback;
 import com.cjcj55.literallynot.db.MySQLHelper;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 
 public class LoginScreen extends Fragment {
 
@@ -47,6 +51,21 @@ public class LoginScreen extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         editUserNameOrEmail = binding.editUser;
         editPassword = binding.editTextTextPassword;
+
+
+        ModelManager.getInstance().initModel(requireContext(), new ModelManager.Callback() {
+            @Override
+            public void onSuccess() {
+                System.out.println("models finished loading!");
+                // handle success
+            }
+
+            @Override
+            public void onFailure(Exception exception) {
+                System.out.println("model files loading failed!");
+                // handle failure
+            }
+        });
 
 
        System.out.println(checkPermissions());
