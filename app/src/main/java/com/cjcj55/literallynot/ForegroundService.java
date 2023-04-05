@@ -94,13 +94,15 @@ public class ForegroundService extends Service {
             // for ActivityCompat#requestPermissions for more details.
             return;
         }
-
-        mAudioRecord = new AudioRecord(MediaRecorder.AudioSource.MIC, SAMPLE_RATE, CHANNEL_CONFIG, AUDIO_FORMAT, BUFFER_SIZE);
+            //UNCOMMENT@@@ THIS TO START SPEECH PROCESS 98-104, 122-123
+      /*@@@ mAudioRecord = new AudioRecord(MediaRecorder.AudioSource.MIC, SAMPLE_RATE, CHANNEL_CONFIG, AUDIO_FORMAT, BUFFER_SIZE);
         mAudioBuffer = new CircularByteBuffer(BUFFER_SIZE);
         mSpeechRecognizer = SpeechRecognizer.createSpeechRecognizer(this);
         mHandlerThread = new HandlerThread(TAG);
         mHandlerThread.start();
         mHandler = new Handler(mHandlerThread.getLooper());
+        @@@
+       */
     }
 
     @Override
@@ -117,8 +119,8 @@ public class ForegroundService extends Service {
             // Start the foreground service with the notification
             startForeground(1001, notification.build());
         }
-        mAudioRecord.startRecording();
-        mHandler.post(new AudioReader());
+      //@@@  mAudioRecord.startRecording();
+      //@@@  mHandler.post(new AudioReader());
         return START_STICKY;
     }
 
@@ -126,10 +128,16 @@ public class ForegroundService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        mHandlerThread.quitSafely();
-        mAudioRecord.stop();
-        mAudioRecord.release();
-        mSpeechRecognizer.destroy();
+        if(mHandlerThread!=null) {
+            mHandlerThread.quitSafely();
+        }
+        if(mAudioRecord!=null) {
+            mAudioRecord.stop();
+            mAudioRecord.release();
+        }
+        if(mSpeechRecognizer!=null) {
+            mSpeechRecognizer.destroy();
+        }
     }
 
     private class AudioReader implements Runnable {
