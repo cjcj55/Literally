@@ -124,7 +124,8 @@ public class MainScreen extends Fragment {
         binding.logoutButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                MySQLHelper.logout(getContext(), MainScreen.this);
+                NavHostFragment.findNavController(MainScreen.this)
+                        .navigate(R.id.action_MainScreen_to_accountMenu);
             }
         });
 

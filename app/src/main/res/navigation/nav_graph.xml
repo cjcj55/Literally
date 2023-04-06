@@ -29,6 +29,9 @@
         <action
             android:id="@+id/action_MainScreen_to_ReportScreen"
             app:destination="@id/ReportScreen" />
+        <action
+            android:id="@+id/action_MainScreen_to_accountMenu"
+            app:destination="@id/accountMenu" />
     </fragment>
 
     <fragment
@@ -49,9 +52,24 @@
         <action
             android:id="@+id/action_ReportScreen_to_MainScreen"
             app:destination="@id/MainScreen" />
+        <action
+            android:id="@+id/action_ReportScreen_to_accountMenu"
+            app:destination="@id/accountMenu" />
     </fragment>
 
     <action
         android:id="@+id/action_logout_to_LoginScreen"
         app:destination="@id/LoginScreen" />
+    <fragment
+        android:id="@+id/accountMenu"
+        android:name="com.cjcj55.literallynot.AccountMenu"
+        android:label="fragment_account_menu"
+        tools:layout="@layout/fragment_account_menu" >
+        <action
+            android:id="@+id/action_accountMenu_to_MainScreen"
+            app:destination="@id/MainScreen" />
+        <action
+            android:id="@+id/action_accountMenu_to_ReportScreen"
+            app:destination="@id/ReportScreen" />
+    </fragment>
 </navigation>

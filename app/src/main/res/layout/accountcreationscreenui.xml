@@ -5,6 +5,17 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".AccountCreationScreen">
+    <ImageView
+        android:id="@+id/imageView3"
+        android:layout_width="100dp"
+        android:layout_height="40dp"
+        android:layout_marginTop="20dp"
+
+        android:src="@drawable/literallynot"
+        app:layout_constraintBottom_toTopOf="@+id/swipeRefreshLayout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
     <EditText
         android:id="@+id/editTextTextLastName"
         android:layout_width="300dp"
@@ -31,25 +42,27 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="@+id/editTextTextLastName"/>
-    <Button
+    <ImageButton
         android:id="@+id/backtologbtn"
         android:layout_width="116dp"
         android:layout_height="54dp"
         android:layout_marginBottom="124dp"
-
-        android:text="Back to Login"
-        android:textColor="@android:color/white"
+        android:scaleType="fitCenter"
+        android:src="@drawable/loginbutton"
+        android:background="@android:color/transparent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent" />
 
-    <Button
+    <ImageButton
         android:id="@+id/createNewAccountButton"
-        android:layout_width="136dp"
-        android:layout_height="50dp"
+        android:layout_width="150dp"
+        android:layout_height="55dp"
         android:layout_marginBottom="15dp"
-        android:text="create account"
+        android:src="@drawable/createaccount"
+        android:scaleType="fitCenter"
+        android:background="@android:color/transparent"
         android:textColor="@android:color/white"
         app:layout_constraintBottom_toTopOf="@+id/backtologbtn"
         app:layout_constraintEnd_toEndOf="parent"
@@ -116,7 +129,7 @@
         android:id="@+id/editTextTextNewPassword"
         android:layout_width="300dp"
         android:layout_height="48dp"
-        android:layout_marginBottom="77dp"
+        android:layout_marginBottom="54dp"
         android:autofillHints="true"
         android:ems="10"
         android:hint="Password"
