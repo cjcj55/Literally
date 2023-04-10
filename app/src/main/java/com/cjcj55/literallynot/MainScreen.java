@@ -1,23 +1,22 @@
 package com.cjcj55.literallynot;
 
-import static androidx.core.content.PermissionChecker.checkCallingOrSelfPermission;
-
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
-import androidx.core.content.PermissionChecker;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.cjcj55.literallynot.databinding.MainscreenuiBinding;
-import com.cjcj55.literallynot.db.AudioFile;
+import com.cjcj55.literallynot.db.AudioClip;
+import com.cjcj55.literallynot.db.AudioListAdapter;
 import com.cjcj55.literallynot.db.MySQLHelper;
 import com.facebook.FacebookSdk;
 import com.facebook.share.model.ShareHashtag;
@@ -27,15 +26,14 @@ import com.facebook.share.widget.ShareButton;
 import org.vosk.android.StorageService;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class MainScreen extends Fragment {
 
     private MainscreenuiBinding binding;
+    private SwipeRefreshLayout swipeRefreshLayout;
+    private RecyclerView recyclerView;
 
     @Override
     public View onCreateView(
@@ -49,6 +47,28 @@ public class MainScreen extends Fragment {
 
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        // Initialize the RecyclerView and SwipeRefreshLayout
+        RecyclerView recyclerView = view.findViewById(R.id.recyclerView);
+        SwipeRefreshLayout swipeRefreshLayout = view.findViewById(R.id.swipeRefreshLayout);
+
+        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+
+        // Create an empty AudioListAdapter and set it to the RecyclerView
+        List<AudioClip> emptyList = new ArrayList<>();
+        AudioListAdapter adapter = new AudioListAdapter(getActivity(), emptyList);
+        recyclerView.setAdapter(adapter);
+
+        // Set the SwipeRefreshLayout listener
+        swipeRefreshLayout.setOnRefreshListener(() -> {
+            MySQLHelper.downloadAndConvertMP3s(getActivity(), recyclerView, swipeRefreshLayout);
+        });
+
+        // Trigger the SwipeRefreshLayout to load data initially
+        swipeRefreshLayout.post(() -> {
+            swipeRefreshLayout.setRefreshing(true);
+            MySQLHelper.downloadAndConvertMP3s(getActivity(), recyclerView, swipeRefreshLayout);
+        });
 
         // Initialize the Facebook SDK
         FacebookSdk.sdkInitialize(getContext());
@@ -128,18 +148,6 @@ public class MainScreen extends Fragment {
                         .navigate(R.id.action_MainScreen_to_accountMenu);
             }
         });
-
-//        MySQLHelper.readAudioFiles(getContext(), new Callback<List<AudioFile>>() {
-//            @Override
-//            public void onResponse(Call<List<AudioFile>> call, retrofit2.Response<List<AudioFile>> response) {
-//
-//            }
-//
-//            @Override
-//            public void onFailure(Call<List<AudioFile>> call, Throwable t) {
-//                // handle error
-//            }
-//        });
     }
 
     private void sendPushNotification() {

@@ -1,5 +1,6 @@
 package com.cjcj55.literallynot.db;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import okhttp3.MultipartBody;
@@ -16,10 +17,4 @@ public interface ApiInterface {
     @Multipart
     @POST("upload-audio")
     Call<ResponseBody> uploadAudio(@Part MultipartBody.Part file, @Part("user_id") RequestBody userId);
-
-    @GET("retrieve-audio-files.php")
-    Call<List<AudioFile>> getAudioFiles(@Query("user_id") int userId);
-
-    @GET("retrieve-audio-file.php")
-    Call<ResponseBody> getAudioFile(@Query("user_id") int userId, @Query("file_name") String fileName);
 }

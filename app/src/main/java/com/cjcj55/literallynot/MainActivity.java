@@ -25,6 +25,8 @@ import androidx.navigation.ui.NavigationUI;
 
 import com.cjcj55.literallynot.databinding.ActivityMainBinding;
 
+import android.os.Environment;
+import android.provider.Settings;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -38,6 +40,7 @@ public class MainActivity extends AppCompatActivity {
     private AppBarConfiguration appBarConfiguration;
     private ActivityMainBinding binding;
     private static final int PERMISSION_REQUEST_CODE = 1369420;
+    private static boolean CAN_MODIFY_STORAGE = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,7 +68,17 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R
+//                && Environment.isExternalStorageManager()) {
+//            // The app has permission to access external storage
+//            CAN_MODIFY_STORAGE = true;
+//        } else {
+//            // Request permission from the user
+//            Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION);
+//            Uri uri = Uri.fromParts("package", getPackageName(), null);
+//            intent.setData(uri);
+//            startActivity(intent);
+//        }
 
     }
 
@@ -155,7 +168,15 @@ public class MainActivity extends AppCompatActivity {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_NOTIFICATION_POLICY) != PackageManager.PERMISSION_GRANTED) {
             isPermissionGranted = false;
         }
-        // Add checks for other permissions here...
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            isPermissionGranted = false;
+        }
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            isPermissionGranted = false;
+        }
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.MANAGE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            isPermissionGranted = false;
+        }
         return isPermissionGranted;
     }
 
@@ -185,6 +206,15 @@ public class MainActivity extends AppCompatActivity {
             }
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.WAKE_LOCK) != PackageManager.PERMISSION_GRANTED) {
                 permissionsToRequest.add(Manifest.permission.WAKE_LOCK);
+            }
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                permissionsToRequest.add(Manifest.permission.READ_EXTERNAL_STORAGE);
+            }
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                permissionsToRequest.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+            }
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.MANAGE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                permissionsToRequest.add(Manifest.permission.MANAGE_EXTERNAL_STORAGE);
             }
             if (!permissionsToRequest.isEmpty()) {
                 ActivityCompat.requestPermissions(this, permissionsToRequest.toArray(new String[0]), PERMISSION_REQUEST_CODE);
