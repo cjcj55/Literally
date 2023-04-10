@@ -1,20 +1,17 @@
 package com.cjcj55.literallynot;
 
+import static androidx.core.content.ContextCompat.startActivity;
+
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
 
-import android.os.Handler;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-
+import com.cjcj55.literallynot.MainActivity;
 import com.cjcj55.literallynot.databinding.SplashscreentestuiBinding;
 
 public class SplashScreentest extends AppCompatActivity {
-
 
     private SplashscreentestuiBinding binding;
 
@@ -23,15 +20,29 @@ public class SplashScreentest extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.splashscreentestui);
 
+        ModelManager.getInstance().initModel(this, new ModelManager.Callback() {
+            @Override
+            public void onSuccess() {
+                System.out.println("models finished loading!");
+                continueToMainActivity();
+            }
+
+            @Override
+            public void onFailure(Exception exception) {
+                System.out.println("model files loading failed!");
+                continueToMainActivity();
+            }
+        });
+    }
+
+    private void continueToMainActivity() {
+        Intent iHome = new Intent(SplashScreentest.this, MainActivity.class);
         new Handler().postDelayed(new Runnable() {
-            Intent iHome = new Intent(SplashScreentest.this, MainActivity.class);
             @Override
             public void run() {
                 startActivity(iHome);
                 finish();
             }
-        }, 4000);
-
-            }
-
+        }, 1000);
     }
+}
