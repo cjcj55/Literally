@@ -10,5 +10,6 @@
     <string name="facebook_app_id">228862266326711</string>
     <string name="facebook_client_token">576b8be43c501170d7ff459b3468245e</string>
     <string name="title_activity_splash_screentest">SplashScreentest</string>
+    <string name="play_button">Play</string>
 
 </resources>

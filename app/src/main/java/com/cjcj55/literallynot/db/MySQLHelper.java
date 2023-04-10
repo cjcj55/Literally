@@ -1,17 +1,24 @@
 package com.cjcj55.literallynot.db;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.os.AsyncTask;
+import android.os.Environment;
 import android.util.Base64;
 import android.util.Log;
+import android.util.LruCache;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.NetworkResponse;
@@ -21,10 +28,13 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.HttpHeaderParser;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.JsonRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.cjcj55.literallynot.R;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.BinaryHttpResponseHandler;
@@ -37,6 +47,7 @@ import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileDescriptor;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -47,6 +58,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Type;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
@@ -58,8 +70,10 @@ import java.util.concurrent.CountDownLatch;
 import cz.msebera.android.httpclient.Header;
 import cz.msebera.android.httpclient.entity.mime.content.ByteArrayBody;
 import cz.msebera.android.httpclient.entity.mime.content.FileBody;
+import okhttp3.FormBody;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
+import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -70,6 +84,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class MySQLHelper {
     private static final String API_URL = "http://18.223.125.204/";
     private static final String TAG = "MySQLHelper";
+    private static final int CACHE_SIZE = 50 * 1024 * 1024; // 50 MB in bytes
 
     public static void registerAccount(String username, String password, String email, String firstName, String lastName, Context context) {
         StringRequest stringRequest = new StringRequest(Request.Method.POST,
@@ -234,6 +249,117 @@ public class MySQLHelper {
             }
         });
 
+    }
+
+    public static void downloadAndConvertMP3s(Activity activity, RecyclerView recyclerView, SwipeRefreshLayout swipeRefreshLayout) {
+        SharedPreferences sharedPreferences = activity.getSharedPreferences("myAppPrefs", Context.MODE_PRIVATE);
+        String userId = String.valueOf(sharedPreferences.getInt("user_id", -1));
+        Log.d("AudioClips", "userId is " + userId);
+
+        // Define the URL for the PHP file
+        String url = API_URL + "read-audio-files.php";
+
+        // Create a request queue for the network operations
+        RequestQueue queue = Volley.newRequestQueue(activity);
+
+        // Create a JSON request to retrieve the audio clip data
+        @SuppressLint("StaticFieldLeak") JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.POST, url, null,
+                response -> {
+                    Log.d("AudioClips", "JSON response received");
+
+                    // AsyncTask for file conversion and RecyclerView update
+                    new AsyncTask<Void, Void, List<AudioClip>>() {
+                        @Override
+                        protected List<AudioClip> doInBackground(Void... voids) {
+                            List<AudioClip> audioClips = new ArrayList<>();
+                            try {
+                                // Get the JSON array from the response
+                                JSONArray jsonArray = response.getJSONArray("files");
+
+                                // Loop through each file in the array
+                                for (int i = 0; i < jsonArray.length(); i++) {
+                                    // Get the file object
+                                    JSONObject fileObject = jsonArray.getJSONObject(i);
+
+                                    // Get the file name, size, data, and time said from the object
+                                    String fileName = fileObject.getString("name");
+                                    long fileSize = fileObject.getLong("size");
+                                    String fileData = fileObject.getString("data");
+                                    String timeSaid = fileObject.getString("time_said");
+
+                                    // Decode the base64-encoded data into a byte array
+                                    byte[] fileBytes = Base64.decode(fileData, Base64.DEFAULT);
+
+                                    File audioDirectory = new File(activity.getCacheDir(), "audio");
+                                    if (!audioDirectory.exists()) {
+                                        audioDirectory.mkdir();
+                                    }
+                                    File file = new File(audioDirectory, fileName);
+                                    if (file.exists()) {
+                                        file.delete();
+                                    }
+                                    FileOutputStream outputStream = new FileOutputStream(file);
+                                    outputStream.write(fileBytes);
+                                    outputStream.close();
+
+
+                                    // Save the byte array to a temporary file
+//                                    File tempFile = File.createTempFile("temp_", ".mp3", activity.getCacheDir());
+//                                    FileOutputStream outputStream = new FileOutputStream(tempFile);
+//                                    outputStream.write(fileBytes);
+//                                    outputStream.close();
+
+                                    // Move the temporary file to the final destination
+//                                    File audioDirectory = new File(activity.getExternalFilesDir(null), "audio");
+//                                    if (!audioDirectory.exists()) {
+//                                        audioDirectory.mkdir();
+//                                    }
+//                                    File finalFile = new File(audioDirectory, fileName);
+//                                    tempFile.renameTo(finalFile);
+
+                                    // Create a new AudioClip object
+                                    AudioClip audioClip = new AudioClip(file.getAbsolutePath(), timeSaid);
+
+                                    // Add the AudioClip object to the list
+                                    audioClips.add(audioClip);
+                                }
+                                Log.d("AudioClips", "Number of audio clips: " + audioClips.size());
+                            } catch (JSONException | IOException e) {
+                                e.printStackTrace();
+                            }
+                            return audioClips;
+                        }
+
+                        @Override
+                        protected void onPostExecute(List<AudioClip> audioClips) {
+                            // Create a new adapter for the RecyclerView
+                            AudioListAdapter adapter = new AudioListAdapter(activity, audioClips);
+
+                            // Set the adapter on the RecyclerView
+                            recyclerView.setAdapter(adapter);
+
+                            // Stop the SwipeRefreshLayout animation
+                            swipeRefreshLayout.setRefreshing(false);
+                        }
+                    }.execute();
+                },
+                error -> {
+                    Log.e("AudioClips", "Error in JsonObjectRequest: " + error.getMessage());
+                    // Handle the error
+                    swipeRefreshLayout.setRefreshing(false);
+                }
+        ) {
+            @Override
+            protected Map<String, String> getParams() {
+                // Set the parameters for the POST request
+                Map<String, String> params = new HashMap<>();
+                params.put("user_id", userId);
+                return params;
+            }
+        };
+
+        // Add the request to the queue
+        queue.add(jsonRequest);
     }
 
     public static void getAllUsers(Context context, Response.Listener<String> responseListener) {
