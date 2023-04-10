@@ -53,21 +53,6 @@ public class LoginScreen extends Fragment {
         editPassword = binding.editTextTextPassword;
 
 
-        ModelManager.getInstance().initModel(requireContext(), new ModelManager.Callback() {
-            @Override
-            public void onSuccess() {
-                System.out.println("models finished loading!");
-                // handle success
-            }
-
-            @Override
-            public void onFailure(Exception exception) {
-                System.out.println("model files loading failed!");
-                // handle failure
-            }
-        });
-
-
        System.out.println(checkPermissions());
 
 
