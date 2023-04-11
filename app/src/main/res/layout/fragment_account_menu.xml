@@ -1,31 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".AccountMenu">
 
     <ImageView
         android:id="@+id/acountsettings"
         android:layout_width="400dp"
-        android:layout_height="100dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="94dp"
+        android:layout_marginBottom="477dp"
         android:background="@android:color/transparent"
         android:scaleType="fitCenter"
         android:src="@drawable/accountsettings"
-        app:layout_constraintBottom_toTopOf="@id/CustomWelcomeName"
+        app:layout_constraintBottom_toTopOf="@+id/reportbutton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageView3" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/CustomWelcomeName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
+        android:fontFamily="@font/contb"
         android:text="User!"
         android:textSize="32sp"
-        android:fontFamily="@font/contb"
         app:layout_constraintBottom_toTopOf="@+id/logoutbutton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -36,9 +38,9 @@
         android:id="@+id/CustomLastName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:fontFamily="@font/contb"
         android:text="User!"
         android:textSize="32sp"
-        android:fontFamily="@font/contb"
         app:layout_constraintBottom_toTopOf="@+id/CustomUsername"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -50,9 +52,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="48dp"
+        android:fontFamily="@font/contb"
         android:text="User!"
         android:textSize="32sp"
-        android:fontFamily="@font/contb"
         app:layout_constraintBottom_toTopOf="@+id/logoutbutton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -67,81 +69,92 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
     <ImageButton
         android:id="@+id/logoutbutton"
         android:layout_width="100dp"
         android:layout_height="55dp"
         android:layout_marginBottom="108dp"
-        android:scaleType="fitCenter"
         android:background="@android:color/transparent"
+        android:scaleType="fitCenter"
         android:src="@drawable/logoutbutton"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent" />
+
     <ImageView
         android:id="@+id/imageView"
-        android:layout_width="400dp"
-        android:layout_height="70dp"
-        android:layout_marginBottom="0dp"
-        android:src="@drawable/rect"
+        android:layout_width="406dp"
+        android:layout_height="83dp"
+        android:layout_marginEnd="3dp"
+        android:src="@drawable/greenglass"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent" />
+
     <ImageButton
         android:id="@+id/reportbutton"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
-        android:layout_marginStart="40dp"
-        android:layout_marginEnd="40dp"
-        android:layout_marginBottom="5dp"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="131dp"
+        android:layout_marginEnd="164dp"
+        android:layout_marginBottom="20dp"
+        android:background="@android:color/transparent"
         android:maxHeight="40dp"
         android:scaleType="fitCenter"
-        android:background="@android:color/transparent"
         android:src="@drawable/bar_graph"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/homebutton" />
+        app:layout_constraintEnd_toStartOf="@+id/logout_button"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/acountsettings" />
 
     <ImageButton
         android:id="@+id/homebutton"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:layout_marginStart="20dp"
-        android:layout_marginEnd="40dp"
+        android:layout_marginTop="5dp"
         android:layout_marginBottom="5dp"
         android:background="@android:color/transparent"
         android:scaleType="fitCenter"
         android:src="@drawable/house"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/imageView" />
 
 
     <ImageButton
-        android:id="@+id/trophybutton"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
+        android:id="@+id/scorebutton"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:layout_marginStart="40dp"
+        android:layout_marginTop="5dp"
         android:layout_marginEnd="40dp"
         android:layout_marginBottom="5dp"
+        android:background="@android:color/transparent"
         android:scaleType="fitCenter"
         android:src="@drawable/trophy2"
-        android:background="@android:color/transparent"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/accountbutton"
-        app:layout_constraintStart_toEndOf="@+id/reportbutton" />
+        app:layout_constraintEnd_toStartOf="@+id/logout_button"
+        app:layout_constraintStart_toEndOf="@+id/reportbutton"
+        app:layout_constraintTop_toTopOf="@+id/imageView" />
 
     <ImageButton
-        android:id="@+id/accountbutton"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
+        android:id="@+id/logout_button"
+        android:layout_width="0dp"
+        android:layout_height="52dp"
+        android:layout_marginTop="5dp"
         android:layout_marginEnd="20dp"
         android:layout_marginBottom="5dp"
-        android:scaleType="fitCenter"
-        android:src="@drawable/acc"
         android:background="@android:color/transparent"
+        android:scaleType="fitCenter"
+        android:src="@drawable/acc_selected"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/reportbutton"
+        app:layout_constraintTop_toTopOf="@+id/imageView" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
