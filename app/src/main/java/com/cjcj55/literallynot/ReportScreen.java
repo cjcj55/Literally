@@ -38,6 +38,7 @@ public class ReportScreen extends Fragment {
                         .navigate(R.id.action_ReportScreen_to_MainScreen);
             }
         });
+
         binding.imageButton3.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -50,6 +51,14 @@ public class ReportScreen extends Fragment {
             public void onClick(View view) {
                 NavHostFragment.findNavController(ReportScreen.this)
                         .navigate(R.id.action_ReportScreen_to_accountMenu);
+            }
+        });
+
+        binding.scorebutton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                NavHostFragment.findNavController(ReportScreen.this)
+                        .navigate(R.id.action_ReportScreen_to_scoreboard);
             }
         });
 

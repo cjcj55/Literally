@@ -32,6 +32,9 @@
         <action
             android:id="@+id/action_MainScreen_to_accountMenu"
             app:destination="@id/accountMenu" />
+        <action
+            android:id="@+id/action_MainScreen_to_scoreboard"
+            app:destination="@id/scoreboard" />
     </fragment>
 
     <fragment
@@ -55,6 +58,9 @@
         <action
             android:id="@+id/action_ReportScreen_to_accountMenu"
             app:destination="@id/accountMenu" />
+        <action
+            android:id="@+id/action_ReportScreen_to_scoreboard"
+            app:destination="@id/scoreboard" />
     </fragment>
 
     <action
@@ -71,5 +77,23 @@
         <action
             android:id="@+id/action_accountMenu_to_ReportScreen"
             app:destination="@id/ReportScreen" />
+        <action
+            android:id="@+id/action_accountMenu_to_scoreboard"
+            app:destination="@id/scoreboard" />
+    </fragment>
+    <fragment
+        android:id="@+id/scoreboard"
+        android:name="com.cjcj55.literallynot.scoreboard"
+        android:label="fragment_scoreboard"
+        tools:layout="@layout/fragment_scoreboard" >
+        <action
+            android:id="@+id/action_scoreboard_to_accountMenu"
+            app:destination="@id/accountMenu" />
+        <action
+            android:id="@+id/action_scoreboard_to_ReportScreen"
+            app:destination="@id/ReportScreen" />
+        <action
+            android:id="@+id/action_scoreboard_to_MainScreen"
+            app:destination="@id/MainScreen" />
     </fragment>
 </navigation>

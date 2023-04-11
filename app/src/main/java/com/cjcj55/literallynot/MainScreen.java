@@ -148,6 +148,14 @@ public class MainScreen extends Fragment {
                         .navigate(R.id.action_MainScreen_to_accountMenu);
             }
         });
+
+        binding.scorebutton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                NavHostFragment.findNavController(MainScreen.this)
+                        .navigate(R.id.action_MainScreen_to_scoreboard);
+            }
+        });
     }
 
     private void sendPushNotification() {

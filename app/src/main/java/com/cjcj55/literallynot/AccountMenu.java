@@ -92,6 +92,14 @@ public class AccountMenu extends Fragment {
             }
         });
 
+        binding.scorebutton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                NavHostFragment.findNavController(AccountMenu.this)
+                        .navigate(R.id.action_accountMenu_to_scoreboard);
+            }
+        });
+
 
     }
 }
