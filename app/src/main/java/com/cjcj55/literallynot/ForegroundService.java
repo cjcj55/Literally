@@ -26,6 +26,7 @@ import android.util.Log;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 
+import com.cjcj55.literallynot.db.MySQLHelper;
 import com.naman14.androidlame.AndroidLame;
 import com.naman14.androidlame.LameBuilder;
 
@@ -95,14 +96,13 @@ public class ForegroundService extends Service {
             return;
         }
         //UNCOMMENT@@@ THIS TO START SPEECH PROCESS 98-104, 122-123
-      /*@@@ mAudioRecord = new AudioRecord(MediaRecorder.AudioSource.MIC, SAMPLE_RATE, CHANNEL_CONFIG, AUDIO_FORMAT, BUFFER_SIZE);
+      mAudioRecord = new AudioRecord(MediaRecorder.AudioSource.MIC, SAMPLE_RATE, CHANNEL_CONFIG, AUDIO_FORMAT, BUFFER_SIZE);
         mAudioBuffer = new CircularByteBuffer(BUFFER_SIZE);
         mSpeechRecognizer = SpeechRecognizer.createSpeechRecognizer(this);
         mHandlerThread = new HandlerThread(TAG);
         mHandlerThread.start();
         mHandler = new Handler(mHandlerThread.getLooper());
-        @@@
-       */
+
     }
 
     @Override
@@ -119,8 +119,8 @@ public class ForegroundService extends Service {
             // Start the foreground service with the notification
             startForeground(1001, notification.build());
         }
-        //@@@  mAudioRecord.startRecording();
-        //@@@  mHandler.post(new AudioReader());
+         mAudioRecord.startRecording();
+         mHandler.post(new AudioReader());
         return START_STICKY;
     }
 
@@ -181,6 +181,8 @@ public class ForegroundService extends Service {
                 //  byte[] keywordAudioData = getAudioDataForTimestamp(keywordTimestamp);
                 //  System.out.println("TESTINGMAIN2" + keywordAudioData.length);
                 saveAudioToFile(mAudioData, getOutputFilePath());
+                File file = new File(getCacheDir(), "recordedAudio.mp3");
+                MySQLHelper.writeAudioFile(getApplicationContext(), file);
             }
         }
 
@@ -242,7 +244,7 @@ public class ForegroundService extends Service {
     private String getOutputFilePath() {
         System.out.println("getting outputfile path");
         File dir = getCacheDir();
-        return new File(dir, "recorded_audio_" + System.currentTimeMillis() + ".mp3").getAbsolutePath();
+        return new File(dir,"recordedAudio.mp3").getAbsolutePath();
     }
 
 
