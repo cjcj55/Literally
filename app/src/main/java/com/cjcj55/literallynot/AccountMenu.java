@@ -12,16 +12,8 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
 
-import com.android.volley.Response;
 import com.cjcj55.literallynot.databinding.FragmentAccountMenuBinding;
-import com.cjcj55.literallynot.databinding.MainscreenuiBinding;
-import com.cjcj55.literallynot.databinding.ReportscreenuiBinding;
 import com.cjcj55.literallynot.db.MySQLHelper;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.w3c.dom.Text;
 
 public class AccountMenu extends Fragment {
 

@@ -1,14 +1,11 @@
 package com.cjcj55.literallynot;
 
-import static androidx.core.content.ContextCompat.startActivity;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.cjcj55.literallynot.MainActivity;
 import com.cjcj55.literallynot.databinding.SplashscreentestuiBinding;
 
 public class SplashScreentest extends AppCompatActivity {
@@ -43,6 +40,6 @@ public class SplashScreentest extends AppCompatActivity {
                 startActivity(iHome);
                 finish();
             }
-        }, 1000);
+        }, 0);
     }
 }

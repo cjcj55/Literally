@@ -17,15 +17,11 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.cjcj55.literallynot.databinding.MainscreenuiBinding;
 import com.cjcj55.literallynot.db.AudioClip;
 import com.cjcj55.literallynot.db.AudioListAdapter;
-import com.cjcj55.literallynot.db.LBEntry;
-import com.cjcj55.literallynot.db.LeaderboardCallback;
 import com.cjcj55.literallynot.db.MySQLHelper;
 import com.facebook.FacebookSdk;
 import com.facebook.share.model.ShareHashtag;
 import com.facebook.share.model.ShareLinkContent;
 import com.facebook.share.widget.ShareButton;
-
-import org.vosk.android.StorageService;
 
 import java.io.File;
 import java.util.ArrayList;

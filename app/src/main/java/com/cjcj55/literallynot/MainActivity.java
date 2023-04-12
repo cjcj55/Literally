@@ -1,5 +1,6 @@
 package com.cjcj55.literallynot;
 
+import android.Manifest;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -7,15 +8,14 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.media.AudioAttributes;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.Manifest;
-import androidx.core.app.ActivityCompat;
+import android.view.Menu;
+import android.view.MenuItem;
 
 import androidx.appcompat.app.AppCompatActivity;
-
+import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.navigation.NavController;
@@ -24,13 +24,6 @@ import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
 import com.cjcj55.literallynot.databinding.ActivityMainBinding;
-
-import android.os.Environment;
-import android.provider.Settings;
-import android.view.Menu;
-import android.view.MenuItem;
-
-import org.vosk.android.StorageService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -67,19 +60,6 @@ public class MainActivity extends AppCompatActivity {
                 notificationManager.createNotificationChannel(channel);
             }
         }
-
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R
-//                && Environment.isExternalStorageManager()) {
-//            // The app has permission to access external storage
-//            CAN_MODIFY_STORAGE = true;
-//        } else {
-//            // Request permission from the user
-//            Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION);
-//            Uri uri = Uri.fromParts("package", getPackageName(), null);
-//            intent.setData(uri);
-//            startActivity(intent);
-//        }
-
     }
 
 
