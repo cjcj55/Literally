@@ -50,9 +50,6 @@ public class LoginScreen extends Fragment {
 
 
 
-        // Stop the foreground service
-        Intent intent = new Intent(getActivity(), ForegroundService.class);
-        getActivity().stopService(intent);
 
 
         binding.LoginBtn.setOnClickListener(new View.OnClickListener() {

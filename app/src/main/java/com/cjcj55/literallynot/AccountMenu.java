@@ -1,6 +1,7 @@
 package com.cjcj55.literallynot;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -66,6 +67,22 @@ public class AccountMenu extends Fragment {
         binding.logoutbutton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                // Get a reference to the shared preferences file
+                SharedPreferences sharedPref = getContext().getSharedPreferences("UserPref", Context.MODE_PRIVATE);
+                // Retrieve the saved state of the serviceRunning variable
+                boolean serviceRunning = sharedPref.getBoolean("isServiceRunning", false);
+                System.out.println("HERE" + serviceRunning);
+                if(serviceRunning)
+                {
+                    Intent forIntent = new Intent(getActivity(), ForegroundService.class);
+                    getActivity().stopService(forIntent);
+                }
+                //Clear the SharedPreferences file
+                SharedPreferences.Editor editor = sharedPref.edit();
+                editor.clear();
+                editor.apply();
+
+
                 MySQLHelper.logout(getContext(), AccountMenu.this);
             }
         });
