@@ -42,8 +42,35 @@ public class scoreboard extends Fragment {
 
 
 
-        TextView textView = view.findViewById(R.id.leaderboard);
-        textView.setText(Arrays.toString(amount));
+        TextView textView1 = view.findViewById(R.id.pos1);
+        textView1.setText("1");
+
+        TextView textView2 = view.findViewById(R.id.pos2);
+        textView2.setText("2");
+
+        TextView textView3 = view.findViewById(R.id.pos3);
+        textView3.setText("3");
+
+        TextView textView4 = view.findViewById(R.id.pos4);
+        textView4.setText("4");
+
+        TextView textView5 = view.findViewById(R.id.pos5);
+        textView5.setText("5");
+
+        TextView textView6 = view.findViewById(R.id.pos6);
+        textView6.setText("6");
+
+        TextView textView7 = view.findViewById(R.id.pos7);
+        textView7.setText("7");
+
+        TextView textView8 = view.findViewById(R.id.pos8);
+        textView8.setText("8");
+
+        TextView textView9 = view.findViewById(R.id.pos9);
+        textView9.setText("9");
+
+        TextView textView10 = view.findViewById(R.id.pos10);
+        textView10.setText("10");
 
 
 
