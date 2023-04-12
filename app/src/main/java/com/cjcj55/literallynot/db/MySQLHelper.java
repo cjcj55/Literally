@@ -28,6 +28,7 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.HttpHeaderParser;
+import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.JsonRequest;
 import com.android.volley.toolbox.StringRequest;
@@ -182,6 +183,52 @@ public class MySQLHelper {
 
         RequestQueue queue = Volley.newRequestQueue(context);
         queue.add(stringRequest);
+    }
+
+    public static List<LBEntry> getLeaderboard(Context context, LeaderboardCallback leaderboardCallback) {
+        List<LBEntry> leaderboard = new ArrayList<>();
+
+        String url = API_URL + "leaderboard.php";
+
+        // Request a string response from the provided URL.
+        JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.GET, url, null,
+                new Response.Listener<JSONArray>() {
+                    @Override
+                    public void onResponse(JSONArray response) {
+                        // Handle the JSON response
+                        try {
+                            // Iterate over the JSON array and extract the data
+                            for (int i = 0; i < response.length(); i++) {
+                                JSONObject row = response.getJSONObject(i);
+                                int userId = row.getInt("user_id");
+                                String username = row.getString("username");
+                                String firstName = row.getString("firstName");
+                                String lastName = row.getString("lastName");
+                                int numFiles = row.getInt("num_files");
+
+                                LBEntry entry = new LBEntry(userId, username, numFiles, firstName, lastName);
+                                leaderboard.add(entry);
+                            }
+                            leaderboardCallback.onSuccess(leaderboard);
+                        } catch (JSONException e) {
+                            // Handle JSON parsing error
+                            e.printStackTrace();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                // Handle the error
+                leaderboardCallback.onFailure();
+                error.printStackTrace();
+            }
+        });
+
+        // Add the request to the RequestQueue.
+        RequestQueue queue = Volley.newRequestQueue(context);
+        queue.add(jsonArrayRequest);
+
+        return leaderboard;
     }
 
     public static void logout(Context context, Fragment fragment) {
