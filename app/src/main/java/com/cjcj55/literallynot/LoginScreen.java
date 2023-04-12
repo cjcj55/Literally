@@ -4,7 +4,6 @@ import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.content.res.AssetManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -14,21 +13,15 @@ import android.widget.EditText;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
-
 
 import com.cjcj55.literallynot.databinding.LoginscreenuiBinding;
 import com.cjcj55.literallynot.db.AudioUploadCallback;
 import com.cjcj55.literallynot.db.LoginCallback;
 import com.cjcj55.literallynot.db.MySQLHelper;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 
 public class LoginScreen extends Fragment {
 

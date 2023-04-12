@@ -1,26 +1,21 @@
 package com.cjcj55.literallynot;
 
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
-import androidx.navigation.fragment.NavHostFragment;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+import androidx.navigation.fragment.NavHostFragment;
+
 import com.cjcj55.literallynot.databinding.FragmentScoreboardBinding;
 import com.cjcj55.literallynot.db.LBEntry;
 import com.cjcj55.literallynot.db.LeaderboardCallback;
 import com.cjcj55.literallynot.db.MySQLHelper;
-import java.util.Arrays;
-import java.util.List;
 
-import android.widget.TextView;
+import java.util.List;
 
 
 public class scoreboard extends Fragment {
@@ -31,13 +26,11 @@ public class scoreboard extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-
         binding = FragmentScoreboardBinding.inflate(inflater, container, false);
         return binding.getRoot();
     }
 
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
-
         MySQLHelper.getLeaderboard(getContext(), new LeaderboardCallback() {
             @Override
             public void onSuccess(List<LBEntry> leaderboard) {
@@ -122,7 +115,5 @@ public class scoreboard extends Fragment {
                         .navigate(R.id.action_scoreboard_to_accountMenu);
             }
         });
-
-
     }
 }

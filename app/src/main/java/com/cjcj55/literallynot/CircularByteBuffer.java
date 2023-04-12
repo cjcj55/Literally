@@ -1,7 +1,5 @@
 package com.cjcj55.literallynot;
 
-import java.util.Arrays;
-
 public class CircularByteBuffer {
 
     private byte[] buffer;

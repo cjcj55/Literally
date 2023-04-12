@@ -84,8 +84,6 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class MySQLHelper {
     private static final String API_URL = "http://18.223.125.204/";
-    private static final String TAG = "MySQLHelper";
-    private static final int CACHE_SIZE = 50 * 1024 * 1024; // 50 MB in bytes
 
     public static void registerAccount(String username, String password, String email, String firstName, String lastName, Context context) {
         StringRequest stringRequest = new StringRequest(Request.Method.POST,
