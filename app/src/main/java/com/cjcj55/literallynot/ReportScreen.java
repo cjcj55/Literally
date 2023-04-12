@@ -31,13 +31,7 @@ public class ReportScreen extends Fragment {
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        binding.reportBckBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                NavHostFragment.findNavController(ReportScreen.this)
-                        .navigate(R.id.action_ReportScreen_to_MainScreen);
-            }
-        });
+
 
         binding.imageButton3.setOnClickListener(new View.OnClickListener() {
             @Override
