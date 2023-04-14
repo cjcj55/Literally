@@ -33,7 +33,6 @@
         android:id="@+id/reportBtn"
         android:layout_width="40dp"
         android:layout_height="40dp"
-        android:layout_marginTop="112dp"
         android:layout_marginEnd="237dp"
         android:background="@android:color/transparent"
         android:maxHeight="40dp"
@@ -42,9 +41,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/imageView"
         app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toEndOf="@+id/imageButton3"
-        app:layout_constraintTop_toTopOf="@+id/send_notification_button"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintStart_toEndOf="@+id/imageButton3" />
 
     <ImageButton
         android:id="@+id/imageButton3"
@@ -109,19 +106,6 @@
 
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
-    <Button
-        android:id="@+id/send_notification_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="7dp"
-        android:text="Send Notification"
-        app:layout_constraintBottom_toTopOf="@+id/imageView"
-        app:layout_constraintEnd_toStartOf="@+id/fb_button"
-        app:layout_constraintHorizontal_bias="0.2"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/swipeRefreshLayout"
-        app:layout_constraintVertical_bias="0.0" />
-
     <com.facebook.share.widget.ShareButton
         android:id="@+id/fb_button"
         android:layout_width="wrap_content"
@@ -144,9 +128,7 @@
         android:layout_marginBottom="124dp"
         android:text="Button"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.564"
-        app:layout_constraintStart_toEndOf="@+id/send_notification_button" />
+        app:layout_constraintEnd_toEndOf="parent" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
