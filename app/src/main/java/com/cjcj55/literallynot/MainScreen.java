@@ -1,6 +1,8 @@
 package com.cjcj55.literallynot;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -32,6 +34,9 @@ public class MainScreen extends Fragment {
     private MainscreenuiBinding binding;
     private SwipeRefreshLayout swipeRefreshLayout;
     private RecyclerView recyclerView;
+    private boolean isServiceRunning;
+    // Declare a SharedPreferences object
+    private SharedPreferences sharedPref;
 
     @Override
     public View onCreateView(
@@ -45,6 +50,21 @@ public class MainScreen extends Fragment {
 
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+
+        // Initialize the SharedPreferences object
+        sharedPref = getActivity().getSharedPreferences("UserPref",Context.MODE_PRIVATE);
+
+
+        // Retrieve the saved state of the isServiceRunning variable
+        isServiceRunning = sharedPref.getBoolean("isServiceRunning", false);
+
+        // Set the button text based on the saved state
+        if (isServiceRunning) {
+            binding.startStopForegroundService.setText("Stop Listening");
+        } else {
+            binding.startStopForegroundService.setText("Start Listening");
+        }
 
         // Initialize the RecyclerView and SwipeRefreshLayout
         RecyclerView recyclerView = view.findViewById(R.id.recyclerView);
@@ -71,9 +91,31 @@ public class MainScreen extends Fragment {
         // Initialize the Facebook SDK
         FacebookSdk.sdkInitialize(getContext());
 
-        // Start the foreground service
-        Intent intent = new Intent(getActivity(), ForegroundService.class);
-        getActivity().startService(intent);
+
+
+        binding.startStopForegroundService.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent forIntent = new Intent(getActivity(), ForegroundService.class);
+
+                if (!isServiceRunning) {
+                    // Start the foreground service
+                    getActivity().startService(forIntent);
+                    binding.startStopForegroundService.setText("Stop Listening");
+                    isServiceRunning = true;
+                } else {
+                    // Stop the foreground service
+                    getActivity().stopService(forIntent);
+                    binding.startStopForegroundService.setText("Start Listening");
+                    isServiceRunning = false;
+                }
+
+                // Save the state of the isServiceRunning variable
+                SharedPreferences.Editor editor = sharedPref.edit();
+                editor.putBoolean("isServiceRunning", isServiceRunning);
+                editor.apply();
+            }
+        });
 
 
 
