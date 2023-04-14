@@ -3,6 +3,7 @@ package com.cjcj55.literallynot;
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
@@ -14,12 +15,15 @@ import android.widget.EditText;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
 
 import com.cjcj55.literallynot.databinding.LoginscreenuiBinding;
 import com.cjcj55.literallynot.db.AudioUploadCallback;
 import com.cjcj55.literallynot.db.LoginCallback;
 import com.cjcj55.literallynot.db.MySQLHelper;
+import com.facebook.login.Login;
 
 import java.io.File;
 
@@ -49,15 +53,23 @@ public class LoginScreen extends Fragment {
        System.out.println(checkPermissions());
 
 
+        SharedPreferences sharedPreferences = getActivity().getSharedPreferences("myAppPrefs", Context.MODE_PRIVATE);
+        boolean isLoggedIn = sharedPreferences.getBoolean("isLoggedIn", false);
+
+        if (isLoggedIn) {
+            NavHostFragment.findNavController(LoginScreen.this)
+                    .navigate(R.id.action_LoginScreen_to_MainScreen);
+        }
+
 
 
 
         binding.LoginBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                if (checkInputs(getUsernameOrEmail(), getPassword(), view)) {
-//                    MySQLHelper.login(getUsernameOrEmail(), getPassword(), getContext(), getActivity(), new LoginCallback() {
-                    MySQLHelper.login("cjcj55", "password", getContext(), getActivity(), new LoginCallback() {
+              if (checkInputs(getUsernameOrEmail(), getPassword(), view)) {
+                  MySQLHelper.login(getUsernameOrEmail(), getPassword(), getContext(), getActivity(), new LoginCallback() {
+                  //  MySQLHelper.login("cjcj55", "password", getContext(), getActivity(), new LoginCallback() {
                         @Override
                         public void onSuccess(int userId, String username, String firstName, String lastName) {
                             NavHostFragment.findNavController(LoginScreen.this)
@@ -69,7 +81,7 @@ public class LoginScreen extends Fragment {
 
                         }
                     });
-//                }
+                }
             }
         });
 
