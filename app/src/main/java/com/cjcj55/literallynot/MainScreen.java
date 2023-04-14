@@ -117,15 +117,6 @@ public class MainScreen extends Fragment {
             }
         });
 
-
-
-        binding.sendNotificationButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                uploadFile();
-            }
-        });
-
         // Create a ShareLinkContent object with the message and hashtag you want to share
         ShareLinkContent content = new ShareLinkContent.Builder()
                 .setContentUrl(Uri.parse("https://www.example.com"))
