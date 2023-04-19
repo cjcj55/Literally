@@ -368,9 +368,6 @@ public class MySQLHelper {
         queue.add(jsonRequest);
     }
 
-
-
-
     public static void downloadAndConvertMP3s(Activity activity, RecyclerView recyclerView, SwipeRefreshLayout swipeRefreshLayout) {
         SharedPreferences sharedPreferences = activity.getSharedPreferences("myAppPrefs", Context.MODE_PRIVATE);
         String userId = String.valueOf(sharedPreferences.getInt("user_id", -1));
