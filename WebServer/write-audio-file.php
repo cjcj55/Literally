@@ -6,6 +6,7 @@ $uploadDir = 'uploads/';
 
 // Get the user_id parameter from the function argument
 $user_id = $_POST['user_id'];
+$text = $_POST['text'];
 
 // Get the uploaded file information
 $uploadedFile = $_FILES['audio'];
@@ -20,7 +21,7 @@ $filePath = $uploadDir . $fileName;
 if (move_uploaded_file($uploadedFile['tmp_name'], $filePath)) {
     // Insert the file path into the database if the file was uploaded successfully
     $dbUploadDir = '/var/www/html/' . $filePath;
-    $sql = "INSERT INTO audio_clips (user_id, filepath) VALUES ('$user_id', '$dbUploadDir')";
+    $sql = "INSERT INTO audio_clips (user_id, filepath, textsaid) VALUES ('$user_id', '$dbUploadDir', '$text')";
     $result = mysqli_query($conn, $sql);
 
     if (!$result) {

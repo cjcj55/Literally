@@ -1,12 +1,12 @@
 <?php
+
 require_once 'connect.php';
 
 // Get the user_id parameter from the function argument
-$user_id = $_POST['user_id'];
-$user_id = 4;
+$user_id = $_GET['user_id'];
 
 // Select all audio files for the given user from the database
-$sql = "SELECT * FROM audio_clips WHERE user_id = '$user_id'";
+$sql = "SELECT * FROM audio_clips WHERE user_id = '$user_id' ORDER BY time_said DESC";
 $result = mysqli_query($conn, $sql);
 
 $response = array(); // Initialize the response array
@@ -22,6 +22,7 @@ if (!$result) {
         // Get the file path from the database
         $filePath = $row['filepath'];
         $timeSaid = $row['time_said'];
+        $text = $row['textsaid'];
 
         // Read the file data into a string
         $fileData = file_get_contents($filePath);
@@ -31,7 +32,8 @@ if (!$result) {
             'name' => basename($filePath),
             'size' => filesize($filePath),
             'data' => base64_encode($fileData),
-            'time_said' => $timeSaid
+            'time_said' => $timeSaid,
+            'textsaid' => $text
         );
     }
 

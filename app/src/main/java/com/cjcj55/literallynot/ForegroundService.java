@@ -173,7 +173,7 @@ public class ForegroundService extends Service {
                 //  System.out.println("TESTINGMAIN2" + keywordAudioData.length);
                 saveAudioToFile(mAudioData, getOutputFilePath());
                 File file = new File(getCacheDir(), "recordedAudio.mp3");
-                MySQLHelper.writeAudioFile(getApplicationContext(), file);
+                MySQLHelper.writeAudioFile(getApplicationContext(), file, text);
             }
         }
 

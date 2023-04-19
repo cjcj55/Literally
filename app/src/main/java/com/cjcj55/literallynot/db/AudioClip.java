@@ -7,20 +7,24 @@ public class AudioClip {
     private final String album;
     private final String timeSaid;
 
-    public AudioClip(String filePath, String title, String artist, String album, String timeSaid) {
+    private final String text;
+
+    public AudioClip(String filePath, String title, String artist, String album, String timeSaid, String text) {
         this.filePath = filePath;
         this.title = title;
         this.artist = artist;
         this.album = album;
         this.timeSaid = timeSaid;
+        this.text = text;
     }
 
-    public AudioClip(String filePath, String timeSaid) {
+    public AudioClip(String filePath, String timeSaid, String text) {
         this.filePath = filePath;
         this.timeSaid = timeSaid;
         this.title = "Literally?!";
         this.artist = "you!";
         this.album = "Literally detox";
+        this.text = text;
     }
 
     public String getFilePath() {
@@ -41,6 +45,10 @@ public class AudioClip {
 
     public String getTimeSaid() {
         return timeSaid;
+    }
+
+    public String getText() {
+        return text;
     }
 }
 

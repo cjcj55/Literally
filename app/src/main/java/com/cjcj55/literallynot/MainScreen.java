@@ -189,20 +189,6 @@ public class MainScreen extends Fragment {
         });
     }
 
-    private void sendPushNotification() {
-        // Get a reference to the parent activity
-        MainActivity activity = (MainActivity) getActivity();
-        if (activity != null) {
-            // Call the createNotification() method on the activity reference
-            activity.createNotification();
-        }
-    }
-
-    private void uploadFile() {
-        File file = new File(getActivity().getCacheDir(), "bean.mp3");
-        MySQLHelper.writeAudioFile(getContext(), file);
-    }
-
     @Override
     public void onDestroyView() {
         super.onDestroyView();
