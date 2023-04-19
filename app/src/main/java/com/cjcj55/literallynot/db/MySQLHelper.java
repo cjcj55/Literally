@@ -376,13 +376,13 @@ public class MySQLHelper {
         Log.d("AudioClips", "userId is " + userId);
 
         // Define the URL for the PHP file
-        String url = API_URL + "read-audio-files.php";
+        String url = API_URL + "read-audio-files.php?user_id=" + userId;
 
         // Create a request queue for the network operations
         RequestQueue queue = Volley.newRequestQueue(activity);
 
         // Create a JSON request to retrieve the audio clip data
-        @SuppressLint("StaticFieldLeak") JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.POST, url, null,
+        @SuppressLint("StaticFieldLeak") JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.GET, url, null,
                 response -> {
                     Log.d("AudioClips", "JSON response received");
 
@@ -467,15 +467,7 @@ public class MySQLHelper {
                     // Handle the error
                     swipeRefreshLayout.setRefreshing(false);
                 }
-        ) {
-            @Override
-            protected Map<String, String> getParams() {
-                // Set the parameters for the POST request
-                Map<String, String> params = new HashMap<>();
-                params.put("user_id", userId);
-                return params;
-            }
-        };
+        );
 
         // Add the request to the queue
         queue.add(jsonRequest);
