@@ -301,6 +301,70 @@ public class MySQLHelper {
 
     }
 
+    public static void getWeekData(Activity activity, WeekDataCallback callback) {
+        SharedPreferences sharedPreferences = activity.getSharedPreferences("myAppPrefs", Context.MODE_PRIVATE);
+        int userId = sharedPreferences.getInt("user_id", -1);
+
+        // Define the URL for the PHP file
+        String url = API_URL + "week-data.php?user_id=" + userId;
+
+        // Create a request queue for the network operations
+        RequestQueue queue = Volley.newRequestQueue(activity);
+
+        // Create JSON request to retrieve time_said values for user
+        JsonArrayRequest jsonRequest = new JsonArrayRequest(Request.Method.GET, url, null,
+                new Response.Listener<JSONArray>() {
+                    @Override
+                    public void onResponse(JSONArray response) {
+                        // Handle the JSON response
+                        try {
+                            Log.d("JSON Response", response.toString());
+
+                            List<String> datetimeList = new ArrayList<>();
+
+                            // Iterate over the JSON array and extract the data
+                            for (int i = 0; i < response.length(); i++) {
+                                String dateTime = response.getString(i);
+                                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+                                Date date = sdf.parse(dateTime);
+                                String dateOnly = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(date);
+                                datetimeList.add(dateOnly);
+                            }
+
+                            callback.onWeekDataReceived(datetimeList);
+
+                        } catch (JSONException e) {
+                            // Handle JSON parsing error
+                            e.printStackTrace();
+                        } catch (ParseException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        // Handle the error
+                        error.printStackTrace();
+                    }
+                })
+        {
+            @Override
+            protected Response<JSONArray> parseNetworkResponse(NetworkResponse response) {
+                try {
+                    String jsonString = new String(response.data, HttpHeaderParser.parseCharset(response.headers));
+                    return Response.success(new JSONArray(jsonString), HttpHeaderParser.parseCacheHeaders(response));
+                } catch (UnsupportedEncodingException | JSONException e) {
+                    return Response.error(new ParseError(e));
+                }
+            }
+        };
+
+
+        // Add the request to the queue
+        queue.add(jsonRequest);
+    }
+
     public static void getWeekData(Activity activity, SwipeRefreshLayout swipeRefreshLayout, WeekDataCallback callback) {
         SharedPreferences sharedPreferences = activity.getSharedPreferences("myAppPrefs", Context.MODE_PRIVATE);
         int userId = sharedPreferences.getInt("user_id", -1);
