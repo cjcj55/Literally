@@ -261,7 +261,7 @@ public class MySQLHelper {
         queue.add(stringRequest);
     }
 
-    public static void writeAudioFile(Context context, File file) {
+    public static void writeAudioFile(Context context, File file, String text) {
         SharedPreferences sharedPreferences = context.getSharedPreferences("myAppPrefs", Context.MODE_PRIVATE);
         String userId = String.valueOf(sharedPreferences.getInt("user_id", -1));
 
@@ -279,8 +279,9 @@ public class MySQLHelper {
         MultipartBody.Part filePart = MultipartBody.Part.createFormData("audio", file.getName(), requestBody);
 
         RequestBody userIdPart = RequestBody.create(MediaType.parse("text/plain"), userId);
+        RequestBody textPart = RequestBody.create(MediaType.parse("text/plain"), text);
 
-        Call<ResponseBody> call = apiInterface.uploadAudio(filePart, userIdPart);
+        Call<ResponseBody> call = apiInterface.uploadAudio(filePart, userIdPart, textPart);
         call.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, retrofit2.Response<ResponseBody> response) {
@@ -405,6 +406,7 @@ public class MySQLHelper {
                                     long fileSize = fileObject.getLong("size");
                                     String fileData = fileObject.getString("data");
                                     String timeSaid = fileObject.getString("time_said");
+                                    String text = fileObject.getString("textsaid");
 
                                     // Decode the base64-encoded data into a byte array
                                     byte[] fileBytes = Base64.decode(fileData, Base64.DEFAULT);
@@ -421,23 +423,8 @@ public class MySQLHelper {
                                     outputStream.write(fileBytes);
                                     outputStream.close();
 
-
-                                    // Save the byte array to a temporary file
-//                                    File tempFile = File.createTempFile("temp_", ".mp3", activity.getCacheDir());
-//                                    FileOutputStream outputStream = new FileOutputStream(tempFile);
-//                                    outputStream.write(fileBytes);
-//                                    outputStream.close();
-
-                                    // Move the temporary file to the final destination
-//                                    File audioDirectory = new File(activity.getExternalFilesDir(null), "audio");
-//                                    if (!audioDirectory.exists()) {
-//                                        audioDirectory.mkdir();
-//                                    }
-//                                    File finalFile = new File(audioDirectory, fileName);
-//                                    tempFile.renameTo(finalFile);
-
                                     // Create a new AudioClip object
-                                    AudioClip audioClip = new AudioClip(file.getAbsolutePath(), timeSaid);
+                                    AudioClip audioClip = new AudioClip(file.getAbsolutePath(), timeSaid, text);
 
                                     // Add the AudioClip object to the list
                                     audioClips.add(audioClip);
