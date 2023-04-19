@@ -20,9 +20,7 @@ public class SplashScreentest extends AppCompatActivity {
         setContentView(R.layout.splashscreentestui);
 
 
-        SharedPreferences sharedPreferences = this.getSharedPreferences("myAppPrefs", Context.MODE_PRIVATE);
-        boolean isLoggedIn = sharedPreferences.getBoolean("isLoggedIn", false);
-        if (!isLoggedIn) {
+
             ModelManager.getInstance().initModel(this, new ModelManager.Callback() {
                 @Override
                 public void onSuccess() {
@@ -36,11 +34,6 @@ public class SplashScreentest extends AppCompatActivity {
                     continueToMainActivity();
                 }
             });
-        }
-        else
-        {
-            continueToMainActivity();
-        }
     }
 
     private void continueToMainActivity() {
