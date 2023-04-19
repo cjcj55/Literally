@@ -20,6 +20,7 @@ import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -52,6 +53,11 @@ public class ReportScreen extends Fragment {
 
         swipeRefreshLayout = getView().findViewById(R.id.swipeRefreshLayout);
         lineChart = getView().findViewById(R.id.lineChart);
+        lineChart.getDescription().setEnabled(false);
+        lineChart.getLegend().setEnabled(false);
+//        lineChart.setDragEnabled(true);
+        lineChart.setPinchZoom(false);
+        lineChart.setDoubleTapToZoomEnabled(false);
 
         // populate the line chart with data
         populateLineChart();
@@ -87,31 +93,6 @@ public class ReportScreen extends Fragment {
                         .navigate(R.id.action_ReportScreen_to_scoreboard);
             }
         });
-
-
-        // Make the network request to get all users
-//        showLoadingIndicator();
-//        MySQLHelper.getAllUsers(getContext(), new Response.Listener<String>() {
-//            @Override
-//            public void onResponse(String response) {
-//                try {
-//                    hideLoadingIndicator();
-//                    JSONArray jsonArray = new JSONArray(response);
-//                    // Iterate over the array and extract user data
-//                    for (int i = 0; i < jsonArray.length(); i++) {
-//                        JSONObject jsonObject = jsonArray.getJSONObject(i);
-//                        String username = jsonObject.getString("username");
-//                        String firstName = jsonObject.getString("firstName");
-//                        String lastName = jsonObject.getString("lastName");
-//                        String email = jsonObject.getString("email");
-//                        // Display the user data on the UI
-//                        binding.userTextView.append(username + ", " + firstName + " " + lastName + ", " + email + "\n");
-//                    }
-//                } catch (JSONException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//        });
     }
 
     private void updateLineChart(List<String> datetimeList, SimpleDateFormat sdf) {
@@ -129,7 +110,7 @@ public class ReportScreen extends Fragment {
                 calendar.setTime(date);
 
                 // get the day of the week for the date (1-7, where 1 is Sunday)
-                int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
+                int dayOfWeek = (calendar.get(Calendar.DAY_OF_WEEK) + 5) % 7; // shift the index by 5 to start from Sunday
 
                 // add the date to the sum for the corresponding day of the week
                 if (sumMap.containsKey(dayOfWeek)) {
@@ -147,8 +128,11 @@ public class ReportScreen extends Fragment {
         // create a list of Entry objects representing the data points
         List<Entry> entries = new ArrayList<>();
 
+        // create an array of day names
+        String[] daysOfWeek = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
+
         // iterate over the days of the week and add a data point for each day
-        for (int i = 1; i <= 7; i++) {
+        for (int i = 0; i < 7; i++) {
             // get the sum of dates for the day of the week, or 0 if there are no dates
             int sum = sumMap.containsKey(i) ? sumMap.get(i) : 0;
 
@@ -172,9 +156,10 @@ public class ReportScreen extends Fragment {
         // set the LineData object to the LineChart
         lineChart.setData(lineData);
         lineChart.invalidate(); // refresh the chart
+
+        // set the day names as the x-axis labels
+        lineChart.getXAxis().setValueFormatter(new IndexAxisValueFormatter(daysOfWeek));
     }
-
-
 
     private void populateLineChart() {
         // Make the network request to get week data
