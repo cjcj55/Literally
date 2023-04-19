@@ -1,6 +1,8 @@
 package com.cjcj55.literallynot;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 
@@ -17,19 +19,28 @@ public class SplashScreentest extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.splashscreentestui);
 
-        ModelManager.getInstance().initModel(this, new ModelManager.Callback() {
-            @Override
-            public void onSuccess() {
-                System.out.println("models finished loading!");
-                continueToMainActivity();
-            }
 
-            @Override
-            public void onFailure(Exception exception) {
-                System.out.println("model files loading failed!");
-                continueToMainActivity();
-            }
-        });
+        SharedPreferences sharedPreferences = this.getSharedPreferences("myAppPrefs", Context.MODE_PRIVATE);
+        boolean isLoggedIn = sharedPreferences.getBoolean("isLoggedIn", false);
+        if (!isLoggedIn) {
+            ModelManager.getInstance().initModel(this, new ModelManager.Callback() {
+                @Override
+                public void onSuccess() {
+                    System.out.println("models finished loading!");
+                    continueToMainActivity();
+                }
+
+                @Override
+                public void onFailure(Exception exception) {
+                    System.out.println("model files loading failed!");
+                    continueToMainActivity();
+                }
+            });
+        }
+        else
+        {
+            continueToMainActivity();
+        }
     }
 
     private void continueToMainActivity() {
