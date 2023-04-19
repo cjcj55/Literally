@@ -96,48 +96,48 @@ public class ReportScreen extends Fragment {
     }
 
     private void updateLineChart(List<String> datetimeList, SimpleDateFormat sdf) {
-        // create a map to store the sum of dates for each day of the week
-        Map<Integer, Integer> sumMap = new HashMap<>();
-
-        // iterate over the date strings and calculate the sum of dates for each day of the week
-        for (String datetime : datetimeList) {
-            try {
-                // parse the date string into a Date object
-                Date date = sdf.parse(datetime);
-
-                // create a Calendar object and set it to the parsed date
-                Calendar calendar = Calendar.getInstance();
-                calendar.setTime(date);
-
-                // get the day of the week for the date (1-7, where 1 is Sunday)
-                int dayOfWeek = (calendar.get(Calendar.DAY_OF_WEEK) + 5) % 7; // shift the index by 5 to start from Sunday
-
-                // add the date to the sum for the corresponding day of the week
-                if (sumMap.containsKey(dayOfWeek)) {
-                    int sum = sumMap.get(dayOfWeek);
-                    sumMap.put(dayOfWeek, sum + 1);
-                } else {
-                    sumMap.put(dayOfWeek, 1);
-                }
-            } catch (ParseException e) {
-                // handle parsing error
-                e.printStackTrace();
-            }
-        }
-
         // create a list of Entry objects representing the data points
         List<Entry> entries = new ArrayList<>();
 
         // create an array of day names
-        String[] daysOfWeek = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
+        String[] daysOfWeek = new String[7];
+        SimpleDateFormat dayFormat = new SimpleDateFormat("EEE");
+        for (int i = 6; i >= 0; i--) {
+            // create a new Calendar instance
+            Calendar calendar = Calendar.getInstance();
 
-        // iterate over the days of the week and add a data point for each day
-        for (int i = 0; i < 7; i++) {
-            // get the sum of dates for the day of the week, or 0 if there are no dates
-            int sum = sumMap.containsKey(i) ? sumMap.get(i) : 0;
+            // set it to the date of the corresponding day (subtracting i days from today)
+            calendar.add(Calendar.DAY_OF_MONTH, -i);
 
-            // create an entry with the day of the week and the sum of dates
-            entries.add(new Entry(i, sum));
+            // format the date as a string and add it to the array
+            daysOfWeek[6 - i] = dayFormat.format(calendar.getTime());
+
+            // calculate the sum of dates for that day
+            int sum = 0;
+            for (String datetime : datetimeList) {
+                try {
+                    // parse the date string into a Date object
+                    Date date = sdf.parse(datetime);
+
+                    // create a Calendar object and set it to the parsed date
+                    Calendar dateCalendar = Calendar.getInstance();
+                    dateCalendar.setTime(date);
+
+                    // compare the day, month, and year of the two calendars
+                    if (dateCalendar.get(Calendar.DAY_OF_MONTH) == calendar.get(Calendar.DAY_OF_MONTH)
+                            && dateCalendar.get(Calendar.MONTH) == calendar.get(Calendar.MONTH)
+                            && dateCalendar.get(Calendar.YEAR) == calendar.get(Calendar.YEAR)) {
+                        // the date matches the current day, add it to the sum
+                        sum++;
+                    }
+                } catch (ParseException e) {
+                    // handle parsing error
+                    e.printStackTrace();
+                }
+            }
+
+            // add a data point for the current day
+            entries.add(new Entry(6 - i, sum));
         }
 
         // create a LineDataSet from the entries
@@ -155,11 +155,22 @@ public class ReportScreen extends Fragment {
 
         // set the LineData object to the LineChart
         lineChart.setData(lineData);
-        lineChart.invalidate(); // refresh the chart
+        lineChart.getAxisLeft().setGranularity(1f); // set the y-axis granularity to 1
+        lineChart.getAxisLeft().setLabelCount(6); // set the number of y-axis labels to 6
+        lineChart.getAxisLeft().setAxisMinimum(0f); // set the y-axis minimum to 0
+        lineChart.getAxisRight().setEnabled(false); // disable the right y-axis
+        lineChart.getXAxis().setGranularity(1f);
+        lineChart.getXAxis().setLabelCount(7);
+        lineChart.setDoubleTapToZoomEnabled(false);
+        lineChart.setPinchZoom(false);
 
         // set the day names as the x-axis labels
         lineChart.getXAxis().setValueFormatter(new IndexAxisValueFormatter(daysOfWeek));
+
+        lineChart.invalidate(); // refresh the chart
     }
+
+
 
     private void populateLineChart() {
         // Make the network request to get week data
