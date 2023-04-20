@@ -1,5 +1,7 @@
 package com.cjcj55.literallynot;
 
+import static android.app.PendingIntent.getActivity;
+
 import android.Manifest;
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -7,6 +9,7 @@ import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.Location;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
@@ -24,6 +27,14 @@ import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 
 import com.cjcj55.literallynot.db.MySQLHelper;
+import com.example.easywaylocation.EasyWayLocation;
+import com.example.easywaylocation.Listener;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.naman14.androidlame.AndroidLame;
 import com.naman14.androidlame.LameBuilder;
 
@@ -52,6 +63,8 @@ public class ForegroundService extends Service {
     private static final String KEYWORD = "literally";
     private static final int KEYWORD_CONTEXT_TIME = 2000; // 2 seconds before and after the keyword
     //^ NOT USED CURRENTLY ;(
+    private double testLat=0;
+    private double testLon=0;
     private static final String CHANNEL_ID = "test";
 
     private AudioRecord mAudioRecord;
@@ -60,9 +73,12 @@ public class ForegroundService extends Service {
     private HandlerThread mHandlerThread;
     private Handler mHandler;
 
+
+
     @Override
     public void onCreate() {
         super.onCreate();
+
 
 
         // Initialize the Vosk model
@@ -131,6 +147,7 @@ public class ForegroundService extends Service {
         }
     }
 
+
     private class AudioReader implements Runnable {
         private final Handler mHandler = new Handler();
 
@@ -161,7 +178,35 @@ public class ForegroundService extends Service {
             String text = null;
 
             text = recognizeSpeech(mAudioData);
-            if (text.contains(KEYWORD)) {
+            if (true) {
+
+                FusedLocationProviderClient fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getApplicationContext());
+
+// Set up location request
+                LocationRequest locationRequest = LocationRequest.create();
+                locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+
+// Request location update
+                fusedLocationProviderClient.requestLocationUpdates(locationRequest, new LocationCallback() {
+                    @Override
+                    public void onLocationResult(LocationResult locationResult) {
+                        if (locationResult != null && locationResult.getLastLocation() != null) {
+                            Location location = locationResult.getLastLocation();
+                            double latitude = location.getLatitude();
+                            double longitude = location.getLongitude();
+                            testLat=location.getLatitude();
+                            testLon=location.getLongitude();
+                            System.out.println("LAT: " + testLat);
+                            System.out.println("LON: " + testLon);
+                            Log.d("TAG", "Latitude: " + latitude + ", Longitude: " + longitude);
+                            // do something with the location here
+                        }
+                    }
+                }, null);
+
+
+
+
                 // Play notification sound
                 Uri notificationSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
                 Ringtone ringtone = RingtoneManager.getRingtone(getApplicationContext(), notificationSound);
@@ -171,9 +216,9 @@ public class ForegroundService extends Service {
                 //  System.out.println("TESTINGMAIN1" + keywordTimestamp);
                 //  byte[] keywordAudioData = getAudioDataForTimestamp(keywordTimestamp);
                 //  System.out.println("TESTINGMAIN2" + keywordAudioData.length);
-                saveAudioToFile(mAudioData, getOutputFilePath());
+               // saveAudioToFile(mAudioData, getOutputFilePath());
                 File file = new File(getCacheDir(), "recordedAudio.mp3");
-                MySQLHelper.writeAudioFile(getApplicationContext(), file, text);
+               // MySQLHelper.writeAudioFile(getApplicationContext(), file, text);
             }
         }
 
