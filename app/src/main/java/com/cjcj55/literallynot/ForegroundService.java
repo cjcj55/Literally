@@ -7,6 +7,7 @@ import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Address;
@@ -23,6 +24,8 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.IBinder;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
 import android.speech.SpeechRecognizer;
 import android.util.Log;
 import android.widget.Toast;
@@ -157,7 +160,7 @@ public class ForegroundService extends Service {
                 System.out.println("READING...WRITING AUDIO TO BUFFER.");
                 int bytesRead = mAudioRecord.read(buffer, 0, buffer.length);
                 mAudioBuffer.write(buffer, 0, bytesRead);
-                mHandler.post(new RecognizeSpeechTask(mAudioBuffer.readAll()));
+               mHandler.post(new RecognizeSpeechTask(mAudioBuffer.readAll()));
             }
         }
     }
@@ -193,6 +196,13 @@ public class ForegroundService extends Service {
                 locationTask.execute(); //async->This will get long and lat.
                 //Inside this is a geocode async, which is where address is gotten
 
+                // Get instance of Vibrator class
+                Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+
+                // Vibrate for 500 milliseconds
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    vibrator.vibrate(VibrationEffect.createOneShot(500, VibrationEffect.DEFAULT_AMPLITUDE));
+                }
                 // Play notification sound
                 Uri notificationSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
                 Ringtone ringtone = RingtoneManager.getRingtone(getApplicationContext(), notificationSound);
