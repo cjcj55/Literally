@@ -9,6 +9,8 @@ import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
@@ -16,12 +18,14 @@ import android.media.MediaRecorder;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.IBinder;
 import android.speech.SpeechRecognizer;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
@@ -48,6 +52,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.List;
+import java.util.Locale;
 
 public class ForegroundService extends Service {
 
@@ -61,10 +67,6 @@ public class ForegroundService extends Service {
     private static final int AUDIO_FORMAT = AudioFormat.ENCODING_PCM_16BIT;
     private static final int CHANNEL_CONFIG = AudioFormat.CHANNEL_IN_MONO;
     private static final String KEYWORD = "literally";
-    private static final int KEYWORD_CONTEXT_TIME = 2000; // 2 seconds before and after the keyword
-    //^ NOT USED CURRENTLY ;(
-    private double testLat=0;
-    private double testLon=0;
     private static final String CHANNEL_ID = "test";
 
     private AudioRecord mAudioRecord;
@@ -74,11 +76,9 @@ public class ForegroundService extends Service {
     private Handler mHandler;
 
 
-
     @Override
     public void onCreate() {
         super.onCreate();
-
 
 
         // Initialize the Vosk model
@@ -102,8 +102,7 @@ public class ForegroundService extends Service {
             // for ActivityCompat#requestPermissions for more details.
             return;
         }
-        //UNCOMMENT@@@ THIS TO START SPEECH PROCESS 98-104, 122-123
-      mAudioRecord = new AudioRecord(MediaRecorder.AudioSource.MIC, SAMPLE_RATE, CHANNEL_CONFIG, AUDIO_FORMAT, BUFFER_SIZE);
+        mAudioRecord = new AudioRecord(MediaRecorder.AudioSource.MIC, SAMPLE_RATE, CHANNEL_CONFIG, AUDIO_FORMAT, BUFFER_SIZE);
         mAudioBuffer = new CircularByteBuffer(BUFFER_SIZE);
         mSpeechRecognizer = SpeechRecognizer.createSpeechRecognizer(this);
         mHandlerThread = new HandlerThread(TAG);
@@ -122,12 +121,11 @@ public class ForegroundService extends Service {
                     .setContentText("Hello")
                     .setContentTitle("Blah");
 
-
             // Start the foreground service with the notification
             startForeground(1001, notification.build());
         }
-         mAudioRecord.startRecording();
-         mHandler.post(new AudioReader());
+        mAudioRecord.startRecording();
+        mHandler.post(new AudioReader());
         return START_STICKY;
     }
 
@@ -135,14 +133,14 @@ public class ForegroundService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if(mHandlerThread!=null) {
+        if (mHandlerThread != null) {
             mHandlerThread.quitSafely();
         }
-        if(mAudioRecord!=null) {
+        if (mAudioRecord != null) {
             mAudioRecord.stop();
             mAudioRecord.release();
         }
-        if(mSpeechRecognizer!=null) {
+        if (mSpeechRecognizer != null) {
             mSpeechRecognizer.destroy();
         }
     }
@@ -166,8 +164,6 @@ public class ForegroundService extends Service {
 
     private class RecognizeSpeechTask implements Runnable {
         private final byte[] mAudioData;
-        private byte[] mSavedAudioData; //The data that contains the keyword
-        private String mText;
 
         RecognizeSpeechTask(byte[] audioData) {
             mAudioData = audioData;
@@ -178,46 +174,33 @@ public class ForegroundService extends Service {
             String text = null;
 
             text = recognizeSpeech(mAudioData);
-            if (true) {
+            if (text.contains(KEYWORD)) {
 
-                FusedLocationProviderClient fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getApplicationContext());
+                if (ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                    // TODO: Consider calling
+                    //    ActivityCompat#requestPermissions
+                    // here to request the missing permissions, and then overriding
+                    //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                    //                                          int[] grantResults)
+                    // to handle the case where the user grants the permission. See the documentation
+                    // for ActivityCompat#requestPermissions for more details.
+                    return;
+                    //^ TO MAKE IT SHUT THE HELL UP
+                }
 
-// Set up location request
-                LocationRequest locationRequest = LocationRequest.create();
-                locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-
-// Request location update
-                fusedLocationProviderClient.requestLocationUpdates(locationRequest, new LocationCallback() {
-                    @Override
-                    public void onLocationResult(LocationResult locationResult) {
-                        if (locationResult != null && locationResult.getLastLocation() != null) {
-                            Location location = locationResult.getLastLocation();
-                            double latitude = location.getLatitude();
-                            double longitude = location.getLongitude();
-                            testLat=location.getLatitude();
-                            testLon=location.getLongitude();
-                            System.out.println("LAT: " + testLat);
-                            System.out.println("LON: " + testLon);
-                            Log.d("TAG", "Latitude: " + latitude + ", Longitude: " + longitude);
-                            // do something with the location here
-                        }
-                    }
-                }, null);
-
-
-
+                // To start the location task
+                LocationTask locationTask = new LocationTask();
+                locationTask.execute(); //async->This will get long and lat.
+                //Inside this is a geocode async, which is where address is gotten
 
                 // Play notification sound
                 Uri notificationSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
                 Ringtone ringtone = RingtoneManager.getRingtone(getApplicationContext(), notificationSound);
                 ringtone.play();
-                // mSavedAudioData=mAudioData;
-                // long keywordTimestamp = getTimestampForKeyword(text, KEYWORD);
-                //  System.out.println("TESTINGMAIN1" + keywordTimestamp);
-                //  byte[] keywordAudioData = getAudioDataForTimestamp(keywordTimestamp);
-                //  System.out.println("TESTINGMAIN2" + keywordAudioData.length);
+                //UNCOMMENT THIS TO SAVE YOUR LITERALLY SNIPPED TO THE DB
                // saveAudioToFile(mAudioData, getOutputFilePath());
                 File file = new File(getCacheDir(), "recordedAudio.mp3");
+                //LIKEWISE
                // MySQLHelper.writeAudioFile(getApplicationContext(), file, text);
             }
         }
@@ -289,5 +272,105 @@ public class ForegroundService extends Service {
     public IBinder onBind(Intent intent) {
         return null;
     }
+
+
+
+    private class GeocodeTask extends AsyncTask<Void, Void, List<Address>> {
+        private double latitude;
+        private double longitude;
+
+        public GeocodeTask(double latitude, double longitude) {
+            this.latitude = latitude;
+            this.longitude = longitude;
+        }
+
+        @Override
+        protected List<Address> doInBackground(Void... voids) {
+            Geocoder geocoder = new Geocoder(ForegroundService.this, Locale.getDefault());
+            List<Address> addresses = null;
+            try {
+                addresses = geocoder.getFromLocation(latitude, longitude, 1);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return addresses;
+        }
+
+        @Override
+        protected void onPostExecute(List<Address> addresses) {
+            // process the address information here
+            if (addresses != null && addresses.size() > 0) {
+                Address address = addresses.get(0);
+                // extract the address components and display them
+                String addressLine = address.getAddressLine(0);
+                String city = address.getLocality();
+                String state = address.getAdminArea();
+                String country = address.getCountryName();
+                String postalCode = address.getPostalCode();
+                String knownName = address.getFeatureName();
+                // do something with the address information here
+                Log.d("TAG", address.toString());
+                Toast.makeText(ForegroundService.this, address.toString(), Toast.LENGTH_LONG).show();
+
+                //TODO: SEND TO DATABASE
+
+            }
+
+        }
+    }
+
+
+
+
+
+    private class LocationTask extends AsyncTask<Void, Void, Void> {
+
+        private FusedLocationProviderClient fusedLocationProviderClient;
+        private LocationCallback locationCallback;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+            // Set up fused location provider client
+            fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getApplicationContext());
+
+            // Set up location request
+            LocationRequest locationRequest = LocationRequest.create();
+            locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+
+            // Set up location callback
+            locationCallback = new LocationCallback() {
+                @Override
+                public void onLocationResult(LocationResult locationResult) {
+                    if (locationResult != null && locationResult.getLastLocation() != null) {
+                        Location location = locationResult.getLastLocation();
+                        double latitude = location.getLatitude();
+                        double longitude = location.getLongitude();
+                        Log.d("TAG", "Latitude: " + latitude + ", Longitude: " + longitude);
+
+                        GeocodeTask geocodeTask = new GeocodeTask(latitude, longitude); //Running geocode on asyntask in background
+                        geocodeTask.execute();
+                        //Address is in here ^
+                    }
+                }
+            };
+
+            // Request location updates
+            try {
+                fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, null);
+            } catch (SecurityException e) {
+                e.printStackTrace();
+            }
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            // Perform background tasks (if any)
+            return null;
+        }
+    }
+
+
 }
 
