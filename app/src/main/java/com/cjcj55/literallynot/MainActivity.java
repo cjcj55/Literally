@@ -1,12 +1,14 @@
 package com.cjcj55.literallynot;
 
 import android.Manifest;
+import android.app.ActivityManager;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
@@ -211,6 +213,30 @@ public class MainActivity extends AppCompatActivity {
             if (!permissionsToRequest.isEmpty()) {
                 ActivityCompat.requestPermissions(this, permissionsToRequest.toArray(new String[0]), PERMISSION_REQUEST_CODE);
             }
+        }
+    }
+
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        // Check if foreground service is running
+        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        boolean isForegroundServiceRunning = false;
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (ForegroundService.class.getName().equals(service.service.getClassName())) {
+                isForegroundServiceRunning = true;
+                break;
+            }
+        }
+
+// If foreground service is not running, clear user preferences
+        if (!isForegroundServiceRunning) {
+            SharedPreferences preferences = getSharedPreferences("UserPref", MODE_PRIVATE);
+            SharedPreferences.Editor editor = preferences.edit();
+            editor.clear();
+            editor.apply();
         }
     }
 
