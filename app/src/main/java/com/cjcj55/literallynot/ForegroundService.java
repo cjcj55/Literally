@@ -7,6 +7,7 @@ import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Address;
@@ -23,6 +24,8 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.IBinder;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
 import android.speech.SpeechRecognizer;
 import android.util.Log;
 import android.widget.Toast;
@@ -125,7 +128,8 @@ public class ForegroundService extends Service {
             startForeground(1001, notification.build());
         }
         mAudioRecord.startRecording();
-        mHandler.post(new AudioReader());
+        // Run the AudioReader on a background thread
+        new AudioReader().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         return START_STICKY;
     }
 
@@ -146,19 +150,19 @@ public class ForegroundService extends Service {
     }
 
 
-    private class AudioReader implements Runnable {
-        private final Handler mHandler = new Handler();
-
+    private class AudioReader extends AsyncTask<Void, Void, Void> {
         @Override
-        public void run() {
+        protected Void doInBackground(Void... voids) {
             System.out.println("AudioBuffer run()");
             byte[] buffer = new byte[BUFFER_SIZE];
             while (mAudioRecord.getRecordingState() == AudioRecord.RECORDSTATE_RECORDING) { //check if mAudioRecord is still recording before attempting to read from it,
                 System.out.println("READING...WRITING AUDIO TO BUFFER.");
                 int bytesRead = mAudioRecord.read(buffer, 0, buffer.length);
+                System.out.println("BYTEREAD" + bytesRead);
                 mAudioBuffer.write(buffer, 0, bytesRead);
                 mHandler.post(new RecognizeSpeechTask(mAudioBuffer.readAll()));
             }
+            return null;
         }
     }
 
@@ -167,6 +171,7 @@ public class ForegroundService extends Service {
 
         RecognizeSpeechTask(byte[] audioData) {
             mAudioData = audioData;
+            System.out.println("audiodata given length" + audioData.length);
         }
 
         @Override
@@ -193,15 +198,23 @@ public class ForegroundService extends Service {
                 locationTask.execute(); //async->This will get long and lat.
                 //Inside this is a geocode async, which is where address is gotten
 
+                // Get instance of Vibrator class
+                Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+
+                // Vibrate for 500 milliseconds
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    vibrator.vibrate(VibrationEffect.createOneShot(500, VibrationEffect.DEFAULT_AMPLITUDE));
+                }
+
                 // Play notification sound
                 Uri notificationSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
                 Ringtone ringtone = RingtoneManager.getRingtone(getApplicationContext(), notificationSound);
                 ringtone.play();
                 //UNCOMMENT THIS TO SAVE YOUR LITERALLY SNIPPED TO THE DB
-               // saveAudioToFile(mAudioData, getOutputFilePath());
+                // saveAudioToFile(mAudioData, getOutputFilePath());
                 File file = new File(getCacheDir(), "recordedAudio.mp3");
                 //LIKEWISE
-               // MySQLHelper.writeAudioFile(getApplicationContext(), file, text);
+                // MySQLHelper.writeAudioFile(getApplicationContext(), file, text);
             }
         }
 
@@ -260,10 +273,11 @@ public class ForegroundService extends Service {
             Log.e(TAG, "Error saving audio to file: " + e.getMessage());
         }
     }
+
     private String getOutputFilePath() {
         System.out.println("getting outputfile path");
         File dir = getCacheDir();
-        return new File(dir,"recordedAudio.mp3").getAbsolutePath();
+        return new File(dir, "recordedAudio.mp3").getAbsolutePath();
     }
 
 
@@ -272,7 +286,6 @@ public class ForegroundService extends Service {
     public IBinder onBind(Intent intent) {
         return null;
     }
-
 
 
     private class GeocodeTask extends AsyncTask<Void, Void, List<Address>> {
@@ -287,6 +300,7 @@ public class ForegroundService extends Service {
         @Override
         protected List<Address> doInBackground(Void... voids) {
             Geocoder geocoder = new Geocoder(ForegroundService.this, Locale.getDefault());
+            System.out.println("HITGEOCODE");
             List<Address> addresses = null;
             try {
                 addresses = geocoder.getFromLocation(latitude, longitude, 1);
@@ -320,9 +334,6 @@ public class ForegroundService extends Service {
     }
 
 
-
-
-
     private class LocationTask extends AsyncTask<Void, Void, Void> {
 
         private FusedLocationProviderClient fusedLocationProviderClient;
@@ -349,9 +360,7 @@ public class ForegroundService extends Service {
                         double longitude = location.getLongitude();
                         Log.d("TAG", "Latitude: " + latitude + ", Longitude: " + longitude);
 
-                        GeocodeTask geocodeTask = new GeocodeTask(latitude, longitude); //Running geocode on asyntask in background
-                        geocodeTask.execute();
-                        //Address is in here ^
+                        getAddressFromLocation(latitude, longitude);
                     }
                 }
             };
@@ -369,8 +378,33 @@ public class ForegroundService extends Service {
             // Perform background tasks (if any)
             return null;
         }
+
+        private void getAddressFromLocation(double latitude, double longitude) {
+            Geocoder geocoder = new Geocoder(ForegroundService.this, Locale.getDefault());
+            System.out.println("HITGEOCODE");
+            List<Address> addresses = null;
+            try {
+                addresses = geocoder.getFromLocation(latitude, longitude, 1);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            if (addresses != null && addresses.size() > 0) {
+                Address address = addresses.get(0);
+                // extract the address components and display them
+                String addressLine = address.getAddressLine(0);
+                String city = address.getLocality();
+                String state = address.getAdminArea();
+                String country = address.getCountryName();
+                String postalCode = address.getPostalCode();
+                String knownName = address.getFeatureName();
+                // do something with the address information here
+                Log.d("TAG", address.toString());
+                Toast.makeText(ForegroundService.this, address.toString(), Toast.LENGTH_LONG).show();
+
+                //TODO: SEND TO DATABASE
+            }
+        }
     }
-
-
 }
 
