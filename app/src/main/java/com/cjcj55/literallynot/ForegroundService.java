@@ -33,15 +33,13 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 
+import com.cjcj55.literallynot.db.LocCallback;
 import com.cjcj55.literallynot.db.MySQLHelper;
-import com.example.easywaylocation.EasyWayLocation;
-import com.example.easywaylocation.Listener;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.naman14.androidlame.AndroidLame;
 import com.naman14.androidlame.LameBuilder;
 
@@ -77,6 +75,7 @@ public class ForegroundService extends Service {
     private SpeechRecognizer mSpeechRecognizer;
     private HandlerThread mHandlerThread;
     private Handler mHandler;
+    private String textSaid;
 
 
     @Override
@@ -192,6 +191,13 @@ public class ForegroundService extends Service {
                     return;
                     //^ TO MAKE IT SHUT THE HELL UP
                 }
+                textSaid = text;
+                textSaid = textSaid.replace("{", "")
+                        .replace("}", "")
+                        .replace("\"", "")
+                        .replace("text", "")
+                        .replace(":", "")
+                        .trim();
 
                 // To start the location task
                 LocationTask locationTask = new LocationTask();
@@ -211,10 +217,8 @@ public class ForegroundService extends Service {
                 Ringtone ringtone = RingtoneManager.getRingtone(getApplicationContext(), notificationSound);
                 ringtone.play();
                 //UNCOMMENT THIS TO SAVE YOUR LITERALLY SNIPPED TO THE DB
-                // saveAudioToFile(mAudioData, getOutputFilePath());
+                saveAudioToFile(mAudioData, getOutputFilePath());
                 File file = new File(getCacheDir(), "recordedAudio.mp3");
-                //LIKEWISE
-                // MySQLHelper.writeAudioFile(getApplicationContext(), file, text);
             }
         }
 
@@ -287,53 +291,6 @@ public class ForegroundService extends Service {
         return null;
     }
 
-
-    private class GeocodeTask extends AsyncTask<Void, Void, List<Address>> {
-        private double latitude;
-        private double longitude;
-
-        public GeocodeTask(double latitude, double longitude) {
-            this.latitude = latitude;
-            this.longitude = longitude;
-        }
-
-        @Override
-        protected List<Address> doInBackground(Void... voids) {
-            Geocoder geocoder = new Geocoder(ForegroundService.this, Locale.getDefault());
-            System.out.println("HITGEOCODE");
-            List<Address> addresses = null;
-            try {
-                addresses = geocoder.getFromLocation(latitude, longitude, 1);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            return addresses;
-        }
-
-        @Override
-        protected void onPostExecute(List<Address> addresses) {
-            // process the address information here
-            if (addresses != null && addresses.size() > 0) {
-                Address address = addresses.get(0);
-                // extract the address components and display them
-                String addressLine = address.getAddressLine(0);
-                String city = address.getLocality();
-                String state = address.getAdminArea();
-                String country = address.getCountryName();
-                String postalCode = address.getPostalCode();
-                String knownName = address.getFeatureName();
-                // do something with the address information here
-                Log.d("TAG", address.toString());
-                Toast.makeText(ForegroundService.this, address.toString(), Toast.LENGTH_LONG).show();
-
-                //TODO: SEND TO DATABASE
-
-            }
-
-        }
-    }
-
-
     private class LocationTask extends AsyncTask<Void, Void, Void> {
 
         private FusedLocationProviderClient fusedLocationProviderClient;
@@ -398,11 +355,14 @@ public class ForegroundService extends Service {
                 String country = address.getCountryName();
                 String postalCode = address.getPostalCode();
                 String knownName = address.getFeatureName();
+                String addr = addressLine + ".  " + city + ", " + state + " " + postalCode;
                 // do something with the address information here
                 Log.d("TAG", address.toString());
                 Toast.makeText(ForegroundService.this, address.toString(), Toast.LENGTH_LONG).show();
 
                 //TODO: SEND TO DATABASE
+                File file = new File(getCacheDir(), "recordedAudio.mp3");
+                MySQLHelper.writeAudioFile(getApplicationContext(), file, textSaid, addr);
             }
         }
     }
