@@ -29,6 +29,13 @@ public class AudioClip {
         this.location = location;
     }
 
+    public String getLocation(){return
+            location;
+    }
+
+    public String getTextSaid(){
+        return text;
+    }
     public String getFilePath() {
         return filePath;
     }
