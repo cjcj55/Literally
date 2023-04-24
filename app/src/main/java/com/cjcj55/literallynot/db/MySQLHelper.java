@@ -171,13 +171,10 @@ public class MySQLHelper {
                             // Iterate over the JSON array and extract the data
                             for (int i = 0; i < response.length(); i++) {
                                 JSONObject row = response.getJSONObject(i);
-                                int userId = row.getInt("user_id");
                                 String username = row.getString("username");
-                                String firstName = row.getString("firstName");
-                                String lastName = row.getString("lastName");
                                 int numFiles = row.getInt("num_files");
 
-                                LBEntry entry = new LBEntry(userId, username, numFiles, firstName, lastName);
+                                LBEntry entry = new LBEntry(username, numFiles);
                                 leaderboard.add(entry);
                             }
                             leaderboardCallback.onSuccess(leaderboard);
