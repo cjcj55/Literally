@@ -37,7 +37,7 @@ public class MainScreen extends Fragment {
     private boolean isServiceRunning;
     // Declare a SharedPreferences object
     private SharedPreferences sharedPref;
-
+    public static int fbnum2;
     @Override
     public View onCreateView(
             LayoutInflater inflater, ViewGroup container,
@@ -90,7 +90,7 @@ public class MainScreen extends Fragment {
 
         // Initialize the Facebook SDK
         FacebookSdk.sdkInitialize(getContext());
-
+        fbnum2 = MySQLHelper.fbnum;
 
 
         binding.startStopForegroundService.setOnClickListener(new View.OnClickListener() {
@@ -120,9 +120,10 @@ public class MainScreen extends Fragment {
         // Create a ShareLinkContent object with the message and hashtag you want to share
         ShareLinkContent content = new ShareLinkContent.Builder()
                 .setContentUrl(Uri.parse("https://www.example.com"))
-                .setQuote("Check out this audio!")
+                .setQuote("I said literally " + fbnum2 + " in my time using the 'LiterallyNot' app")
                 .setShareHashtag(new ShareHashtag.Builder()
                         .setHashtag("#LiterallyNot")
+                        .setHashtag("#"+ fbnum2 +"times")
                         .build())
                 .build();
 
@@ -143,16 +144,15 @@ public class MainScreen extends Fragment {
                 binding.fbButton.setEnabled(false);
 
                 // Share the message and hashtag
-                ShareHashtag hashtag = new ShareHashtag.Builder()
-                        .setHashtag("#yourhashtag")
-                        .build();
+                // Create a ShareLinkContent object with the message and hashtag you want to share
                 ShareLinkContent content = new ShareLinkContent.Builder()
-                        .setQuote("your message")
-                        .setShareHashtag(hashtag)
+                        .setContentUrl(Uri.parse("https://www.example.com"))
+                        .setQuote("I said literally " + fbnum2 + " in my time using the 'LiterallyNot' app")
+                        .setShareHashtag(new ShareHashtag.Builder()
+                                .setHashtag("#LiterallyNot")
+                                .setHashtag("#"+ fbnum2 +"times")
+                                .build())
                         .build();
-                ShareButton shareButton = new ShareButton(getContext());
-                shareButton.setShareContent(content);
-                shareButton.performClick();
 
                 // Re-enable the button after a short delay
                 view.postDelayed(new Runnable() {
