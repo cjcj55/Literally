@@ -359,9 +359,8 @@ public class ForegroundService extends Service {
                 // do something with the address information here
                 Log.d("TAG", address.toString());
 
-                //TODO: SEND TO DATABASE
                 File file = new File(getCacheDir(), "recordedAudio.mp3");
-                MySQLHelper.writeAudioFile(getApplicationContext(), file, textSaid, addr);
+                MySQLHelper.writeAudioFile(getApplicationContext(), file, textSaid, addressLine);
             }
         }
     }
