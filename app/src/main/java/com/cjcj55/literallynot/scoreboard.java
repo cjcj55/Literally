@@ -38,27 +38,27 @@ public class scoreboard extends Fragment {
 
                 if (length >= 1) {
                     TextView textView1 = view.findViewById(R.id.pos1);
-                    textView1.setText((leaderboard.get(0)).getName() + " " + (leaderboard.get(0)).getNumFiles());
+                    textView1.setText("1st: " +  (leaderboard.get(0)).getName() + ", " + (leaderboard.get(0)).getNumFiles());
                 }
 
                 if (length >= 2) {
                     TextView textView2 = view.findViewById(R.id.pos2);
-                    textView2.setText((leaderboard.get(1)).getName() + " " + (leaderboard.get(1)).getNumFiles());
+                    textView2.setText("2nd: " +  (leaderboard.get(1)).getName() + ", " + (leaderboard.get(1)).getNumFiles());
                 }
 
                 if (length >= 3) {
                     TextView textView3 = view.findViewById(R.id.pos3);
-                    textView3.setText((leaderboard.get(2)).getName() + " " + (leaderboard.get(2)).getNumFiles());
+                    textView3.setText("3rd: " +  (leaderboard.get(2)).getName() + ", " + (leaderboard.get(2)).getNumFiles());
                 }
 
                 if (length >= 4) {
                     TextView textView4 = view.findViewById(R.id.pos4);
-                    textView4.setText((leaderboard.get(3)).getName() + " " + (leaderboard.get(3)).getNumFiles());
+                    textView4.setText("4th: " +  (leaderboard.get(3)).getName() + ", " + (leaderboard.get(3)).getNumFiles());
                 }
 
                 if (length >= 5) {
                     TextView textView5 = view.findViewById(R.id.pos5);
-                    textView5.setText((leaderboard.get(4)).getName() + " " + (leaderboard.get(4)).getNumFiles());
+                    textView5.setText("5th: " +  (leaderboard.get(4)).getName() + ", " + (leaderboard.get(4)).getNumFiles());
                 }
             }
 
