@@ -358,7 +358,6 @@ public class ForegroundService extends Service {
                 String addr = addressLine + ".  " + city + ", " + state + " " + postalCode;
                 // do something with the address information here
                 Log.d("TAG", address.toString());
-                Toast.makeText(ForegroundService.this, address.toString(), Toast.LENGTH_LONG).show();
 
                 //TODO: SEND TO DATABASE
                 File file = new File(getCacheDir(), "recordedAudio.mp3");
