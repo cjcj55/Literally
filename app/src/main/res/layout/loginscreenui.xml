@@ -10,14 +10,18 @@
         android:id="@+id/editTextTextPassword"
         android:layout_width="300dp"
         android:layout_height="48dp"
+        android:layout_marginStart="55dp"
+        android:layout_marginTop="41dp"
+        android:layout_marginEnd="56dp"
         android:autofillHints="true"
         android:ems="10"
+
         android:hint="Password"
         android:inputType="textPassword"
         android:textColorHint="#7E7878"
-
-        tools:layout_editor_absoluteX="55dp"
-        tools:layout_editor_absoluteY="383dp" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/editUser" />
 
     <TextView
         android:id="@+id/username_error_text"
@@ -39,32 +43,44 @@
         android:id="@+id/editUser"
         android:layout_width="300dp"
         android:layout_height="48dp"
+        android:layout_marginStart="56dp"
+        android:layout_marginTop="41dp"
+        android:layout_marginEnd="55dp"
         android:autofillHints="true"
         android:ems="10"
         android:hint="Username or Email"
         android:textColorHint="#7E7878"
-        tools:layout_editor_absoluteX="56dp"
-        tools:layout_editor_absoluteY="294dp" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/LoginScreenHeader" />
 
 
     <ImageView
         android:id="@+id/LoginScreenHeader"
         android:layout_width="360dp"
         android:layout_height="173dp"
+        android:layout_marginStart="26dp"
+        android:layout_marginTop="80dp"
+        android:layout_marginEnd="26dp"
         android:src="@drawable/literallynot"
-        tools:layout_editor_absoluteX="25dp"
-        tools:layout_editor_absoluteY="80dp" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ImageButton
         android:id="@+id/LoginBtn"
         android:layout_width="100dp"
         android:layout_height="55dp"
+        android:layout_marginStart="156dp"
+        android:layout_marginTop="78dp"
+        android:layout_marginEnd="155dp"
         android:background="@android:color/background_light"
         android:maxWidth="64dp"
         android:scaleType="fitCenter"
         android:src="@drawable/loginbutton"
-        tools:layout_editor_absoluteX="156dp"
-        tools:layout_editor_absoluteY="509dp" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/editTextTextPassword" />
 
     <ImageButton
         android:id="@+id/ToAccCreationBtn"
