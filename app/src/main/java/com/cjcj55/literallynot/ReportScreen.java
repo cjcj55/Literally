@@ -47,7 +47,7 @@ public class ReportScreen extends Fragment {
     private SwipeRefreshLayout swipeRefreshLayout;
     private LineChart lineChart;
     private TextView statTextView;
-    public int totalsum = 0;
+    public int totalsum;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -102,55 +102,24 @@ public class ReportScreen extends Fragment {
                         .navigate(R.id.action_ReportScreen_to_scoreboard);
             }
         });
-        FacebookSdk.sdkInitialize(getContext());
-
-
-        // Create a ShareLinkContent object with the message and hashtag you want to share
-        ShareLinkContent content = new ShareLinkContent.Builder()
-                .setContentUrl(Uri.parse("www.example.com"))
-                .setQuote("I said literally " + totalsum + " times this week"  )
-                .setShareHashtag(new ShareHashtag.Builder()
-                        .setHashtag("#LiterallyNot")
-                        .build())
-                .build();
 
         // Get a reference to the ShareButton view
         ShareButton shareButton = binding.fbButton;
+        binding.fbButton.setEnabled(true);
 
-
-
-
-        // Set the ShareContent on the ShareButton
-        shareButton.setShareContent(content);
-
-        // Set a click listener on the ShareButton
         shareButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-                /// Disable the button
-                binding.fbButton.setEnabled(false);
-
                 ShareLinkContent content = new ShareLinkContent.Builder()
                         .setContentUrl(Uri.parse("www.example.com"))
                         .setQuote("I said literally " + totalsum + " times this week"  )
                         .setShareHashtag(new ShareHashtag.Builder()
-                                .setHashtag("#LiterallyNot")
+                                .setHashtag("#" + totalsum + "times")
                                 .build())
                         .build();
                 ShareButton shareButton = new ShareButton(getContext());
                 shareButton.setShareContent(content);
                 shareButton.performClick();
-
-                // Re-enable the button after a short delay
-                view.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        binding.fbButton.setEnabled(true);
-
-
-                    }
-                }, 1000); // Delay time in milliseconds
             }
         });
     }
