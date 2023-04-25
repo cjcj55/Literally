@@ -360,9 +360,8 @@ public class ForegroundService extends Service {
                 Log.d("TAG", address.toString());
                 Toast.makeText(ForegroundService.this, address.toString(), Toast.LENGTH_LONG).show();
 
-                //TODO: SEND TO DATABASE
                 File file = new File(getCacheDir(), "recordedAudio.mp3");
-                MySQLHelper.writeAudioFile(getApplicationContext(), file, textSaid, addr);
+                MySQLHelper.writeAudioFile(getApplicationContext(), file, textSaid, addressLine);
             }
         }
     }
